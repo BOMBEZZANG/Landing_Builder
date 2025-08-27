@@ -2,15 +2,30 @@ import { create } from 'zustand';
 import { Section, PageState, BuilderState } from '@/types/builder.types';
 import { v4 as uuidv4 } from 'uuid';
 
+interface HistoryState {
+  past: PageState[];
+  present: PageState;
+  future: PageState[];
+}
+
 interface BuilderStore extends BuilderState {
+  // History state
+  history: HistoryState;
+  canUndo: boolean;
+  canRedo: boolean;
+  
   // Actions
   initializePage: () => void;
+  loadTemplate: (page: PageState) => void;
   updateSection: (sectionId: string, updates: Partial<Section['data']>) => void;
-  reorderSections: (newOrder: string[]) => void;
+  reorderSections: (sections: Section[]) => void;
   selectSection: (sectionId: string | null) => void;
   togglePreview: () => void;
   updateGlobalStyles: (styles: Partial<PageState['globalStyles']>) => void;
   updateMetadata: (metadata: Partial<PageState['metadata']>) => void;
+  undo: () => void;
+  redo: () => void;
+  saveToHistory: () => void;
   saveToLocalStorage: () => void;
   loadFromLocalStorage: () => void;
   resetPage: () => void;
@@ -18,7 +33,7 @@ interface BuilderStore extends BuilderState {
 
 const defaultSections: Section[] = [
   {
-    id: uuidv4(),
+    id: 'hero-default-section',
     type: 'hero',
     order: 0,
     data: {
@@ -35,7 +50,7 @@ const defaultSections: Section[] = [
     }
   },
   {
-    id: uuidv4(),
+    id: 'content-default-section',
     type: 'content',
     order: 1,
     data: {
@@ -48,7 +63,7 @@ const defaultSections: Section[] = [
     }
   },
   {
-    id: uuidv4(),
+    id: 'cta-default-section',
     type: 'cta',
     order: 2,
     data: {
@@ -70,7 +85,7 @@ const defaultSections: Section[] = [
 ];
 
 const createDefaultPage = (): PageState => ({
-  id: uuidv4(),
+  id: 'default-page',
   title: 'Untitled Landing Page',
   sections: defaultSections,
   globalStyles: {
@@ -83,126 +98,287 @@ const createDefaultPage = (): PageState => ({
   }
 });
 
-export const useBuilderStore = create<BuilderStore>((set, get) => ({
-  // Initial state
-  page: createDefaultPage(),
-  selectedSectionId: null,
-  isPreviewMode: false,
-  isDragging: false,
-  hasUnsavedChanges: false,
+// Helper function to deep clone page state
+const clonePage = (page: PageState): PageState => JSON.parse(JSON.stringify(page));
 
-  // Actions implementation
-  initializePage: () => {
-    try {
-      const saved = localStorage.getItem('builder-draft');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        set({ page: parsed, hasUnsavedChanges: false });
+// Helper function to create initial history state
+const createInitialHistory = (page: PageState): HistoryState => ({
+  past: [],
+  present: clonePage(page),
+  future: []
+});
+
+// Helper function to limit history size
+const MAX_HISTORY_SIZE = 50;
+const limitHistory = (history: PageState[]): PageState[] => {
+  if (history.length > MAX_HISTORY_SIZE) {
+    return history.slice(-MAX_HISTORY_SIZE);
+  }
+  return history;
+};
+
+export const useBuilderStore = create<BuilderStore>((set, get) => {
+  const defaultPage = createDefaultPage();
+  
+  return {
+    // Initial state
+    page: defaultPage,
+    selectedSectionId: null,
+    isPreviewMode: false,
+    isDragging: false,
+    hasUnsavedChanges: false,
+    history: createInitialHistory(defaultPage),
+    canUndo: false,
+    canRedo: false,
+
+    // Actions implementation
+    initializePage: () => {
+      try {
+        const saved = localStorage.getItem('builder-draft');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          set((state) => ({
+            page: parsed,
+            history: createInitialHistory(parsed),
+            canUndo: false,
+            canRedo: false,
+            hasUnsavedChanges: false
+          }));
+        }
+      } catch (error) {
+        console.error('Failed to load saved page:', error);
+        // Keep default page if loading fails
       }
-    } catch (error) {
-      console.error('Failed to load saved page:', error);
-      // Keep default page if loading fails
-    }
-  },
+    },
 
-  updateSection: (sectionId, updates) => {
-    set((state) => {
-      const updatedSections = state.page.sections.map((section) =>
-        section.id === sectionId
-          ? { ...section, data: { ...section.data, ...updates } as any }
-          : section
-      );
+    loadTemplate: (page) => {
+      const loadedPage = clonePage(page);
+      set((state) => ({
+        page: loadedPage,
+        history: createInitialHistory(loadedPage),
+        canUndo: false,
+        canRedo: false,
+        selectedSectionId: null,
+        isPreviewMode: false,
+        hasUnsavedChanges: true
+      }));
+    },
+
+    saveToHistory: () => {
+      set((state) => {
+        const newHistory: HistoryState = {
+          past: limitHistory([...state.history.past, clonePage(state.history.present)]),
+          present: clonePage(state.page),
+          future: []
+        };
+        
+        return {
+          history: newHistory,
+          canUndo: newHistory.past.length > 0,
+          canRedo: false
+        };
+      });
+    },
+
+    undo: () => {
+      set((state) => {
+        if (state.history.past.length === 0) return state;
+        
+        const previous = state.history.past[state.history.past.length - 1];
+        const newPast = state.history.past.slice(0, -1);
+        
+        const newHistory: HistoryState = {
+          past: newPast,
+          present: clonePage(previous),
+          future: [clonePage(state.history.present), ...state.history.future]
+        };
+        
+        return {
+          page: previous,
+          history: newHistory,
+          canUndo: newPast.length > 0,
+          canRedo: true,
+          hasUnsavedChanges: true,
+          selectedSectionId: null // Clear selection on undo
+        };
+      });
+    },
+
+    redo: () => {
+      set((state) => {
+        if (state.history.future.length === 0) return state;
+        
+        const next = state.history.future[0];
+        const newFuture = state.history.future.slice(1);
+        
+        const newHistory: HistoryState = {
+          past: [...state.history.past, clonePage(state.history.present)],
+          present: clonePage(next),
+          future: newFuture
+        };
+        
+        return {
+          page: next,
+          history: newHistory,
+          canUndo: true,
+          canRedo: newFuture.length > 0,
+          hasUnsavedChanges: true,
+          selectedSectionId: null // Clear selection on redo
+        };
+      });
+    },
+
+    updateSection: (sectionId, updates) => {
+      // Save current state to history before making changes
+      get().saveToHistory();
       
-      return {
-        ...state,
-        page: {
+      set((state) => {
+        const updatedSections = state.page.sections.map((section) =>
+          section.id === sectionId
+            ? { ...section, data: { ...section.data, ...updates } as any }
+            : section
+        );
+        
+        const newPage = {
           ...state.page,
           sections: updatedSections
-        },
-        hasUnsavedChanges: true
-      };
-    });
-  },
+        };
+        
+        const newHistory: HistoryState = {
+          ...state.history,
+          present: clonePage(newPage)
+        };
+        
+        return {
+          page: newPage,
+          history: newHistory,
+          hasUnsavedChanges: true
+        };
+      });
+    },
 
-  reorderSections: (newOrder) => {
-    set((state) => {
-      const reorderedSections = newOrder.map((id, index) => {
-        const section = state.page.sections.find(s => s.id === id);
-        return section ? { ...section, order: index } : null;
-      }).filter(Boolean) as Section[];
-
-      return {
-        page: {
+    reorderSections: (sections) => {
+      // Save current state to history before making changes
+      get().saveToHistory();
+      
+      set((state) => {
+        const newPage = {
           ...state.page,
-          sections: reorderedSections
-        },
-        hasUnsavedChanges: true
-      };
-    });
-  },
+          sections: sections
+        };
+        
+        const newHistory: HistoryState = {
+          ...state.history,
+          present: clonePage(newPage)
+        };
+        
+        return {
+          page: newPage,
+          history: newHistory,
+          hasUnsavedChanges: true
+        };
+      });
+    },
 
-  selectSection: (sectionId) => {
-    set({ selectedSectionId: sectionId });
-  },
+    selectSection: (sectionId) => {
+      set({ selectedSectionId: sectionId });
+    },
 
-  togglePreview: () => {
-    set((state) => ({ 
-      isPreviewMode: !state.isPreviewMode,
-      selectedSectionId: state.isPreviewMode ? state.selectedSectionId : null
-    }));
-  },
+    togglePreview: () => {
+      set((state) => ({ 
+        isPreviewMode: !state.isPreviewMode,
+        selectedSectionId: state.isPreviewMode ? state.selectedSectionId : null
+      }));
+    },
 
-  updateGlobalStyles: (styles) => {
-    set((state) => ({
-      page: {
-        ...state.page,
-        globalStyles: { ...state.page.globalStyles, ...styles }
-      },
-      hasUnsavedChanges: true
-    }));
-  },
+    updateGlobalStyles: (styles) => {
+      // Save current state to history before making changes
+      get().saveToHistory();
+      
+      set((state) => {
+        const newPage = {
+          ...state.page,
+          globalStyles: { ...state.page.globalStyles, ...styles }
+        };
+        
+        const newHistory: HistoryState = {
+          ...state.history,
+          present: clonePage(newPage)
+        };
+        
+        return {
+          page: newPage,
+          history: newHistory,
+          hasUnsavedChanges: true
+        };
+      });
+    },
 
-  updateMetadata: (metadata) => {
-    set((state) => ({
-      page: {
-        ...state.page,
-        metadata: { ...state.page.metadata, ...metadata }
-      },
-      hasUnsavedChanges: true
-    }));
-  },
+    updateMetadata: (metadata) => {
+      // Save current state to history before making changes
+      get().saveToHistory();
+      
+      set((state) => {
+        const newPage = {
+          ...state.page,
+          metadata: { ...state.page.metadata, ...metadata }
+        };
+        
+        const newHistory: HistoryState = {
+          ...state.history,
+          present: clonePage(newPage)
+        };
+        
+        return {
+          page: newPage,
+          history: newHistory,
+          hasUnsavedChanges: true
+        };
+      });
+    },
 
-  saveToLocalStorage: () => {
-    try {
-      const state = get();
-      localStorage.setItem('builder-draft', JSON.stringify(state.page));
-      set({ hasUnsavedChanges: false });
-    } catch (error) {
-      console.error('Failed to save page:', error);
-    }
-  },
-
-  loadFromLocalStorage: () => {
-    try {
-      const saved = localStorage.getItem('builder-draft');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        set({ page: parsed, hasUnsavedChanges: false });
+    saveToLocalStorage: () => {
+      try {
+        const state = get();
+        localStorage.setItem('builder-draft', JSON.stringify(state.page));
+        set({ hasUnsavedChanges: false });
+      } catch (error) {
+        console.error('Failed to save page:', error);
       }
-    } catch (error) {
-      console.error('Failed to load saved page:', error);
-    }
-  },
+    },
 
-  resetPage: () => {
-    set({
-      page: createDefaultPage(),
-      selectedSectionId: null,
-      isPreviewMode: false,
-      hasUnsavedChanges: false
-    });
-  }
-}));
+    loadFromLocalStorage: () => {
+      try {
+        const saved = localStorage.getItem('builder-draft');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          set((state) => ({
+            page: parsed,
+            history: createInitialHistory(parsed),
+            canUndo: false,
+            canRedo: false,
+            hasUnsavedChanges: false
+          }));
+        }
+      } catch (error) {
+        console.error('Failed to load saved page:', error);
+      }
+    },
+
+    resetPage: () => {
+      const newPage = createDefaultPage();
+      set({
+        page: newPage,
+        history: createInitialHistory(newPage),
+        canUndo: false,
+        canRedo: false,
+        selectedSectionId: null,
+        isPreviewMode: false,
+        hasUnsavedChanges: false
+      });
+    }
+  };
+});
 
 // Auto-save functionality
 let autoSaveInterval: NodeJS.Timeout;

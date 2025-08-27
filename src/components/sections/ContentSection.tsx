@@ -3,6 +3,7 @@ import { ContentSection as ContentSectionType } from '@/types/builder.types';
 import { cn } from '@/lib/utils';
 import { PADDING_OPTIONS } from '@/types/builder.types';
 import InlineTextEditor from '@/components/editor/InlineTextEditor';
+import ImageUploader from '@/components/editor/ImageUploader';
 
 interface ContentSectionProps {
   section: ContentSectionType;
@@ -124,59 +125,44 @@ export default function ContentSection({
             'flex justify-center items-center',
             imagePositionClasses.imageContainer
           )}>
-            {data.imageUrl ? (
-              <div className="relative group">
-                <img
-                  src={data.imageUrl}
-                  alt=""
-                  className="w-full max-w-md lg:max-w-lg rounded-lg shadow-lg object-cover"
+            {isEditing ? (
+              <div className="w-full max-w-md lg:max-w-lg">
+                <ImageUploader
+                  onUpload={(url, publicId) => {
+                    console.log('Image uploaded successfully:', { url, publicId });
+                    onUpdate({ imageUrl: url, imagePublicId: publicId });
+                  }}
+                  currentImage={data.imageUrl}
+                  aspectRatio="free"
+                  maxSize={5}
                 />
-                {isEditing && (
-                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
-                    <button
-                      className="px-4 py-2 bg-white text-gray-800 rounded-md text-sm font-medium hover:bg-gray-100"
-                      onClick={() => {
-                        // Image upload functionality will be implemented in Phase 2
-                        console.log('Image upload placeholder');
-                      }}
-                    >
-                      Change Image
-                    </button>
-                  </div>
-                )}
               </div>
+            ) : data.imageUrl ? (
+              <img
+                src={data.imageUrl}
+                alt=""
+                className="w-full max-w-md lg:max-w-lg rounded-lg shadow-lg object-cover"
+              />
             ) : (
               <div className="w-full max-w-md lg:max-w-lg h-64 bg-gray-200 rounded-lg flex items-center justify-center">
-                {isEditing ? (
-                  <button
-                    className="px-6 py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors"
-                    onClick={() => {
-                      // Image upload functionality will be implemented in Phase 2
-                      console.log('Image upload placeholder');
-                    }}
-                  >
-                    Add Image
-                  </button>
-                ) : (
-                  <div className="text-gray-400 text-center">
-                    <div className="w-16 h-16 mx-auto mb-2 bg-gray-300 rounded-lg flex items-center justify-center">
-                      <svg
-                        className="w-8 h-8"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                    </div>
-                    <p className="text-sm">Image placeholder</p>
+                <div className="text-gray-400 text-center">
+                  <div className="w-16 h-16 mx-auto mb-2 bg-gray-300 rounded-lg flex items-center justify-center">
+                    <svg
+                      className="w-8 h-8"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
                   </div>
-                )}
+                  <p className="text-sm">Image placeholder</p>
+                </div>
               </div>
             )}
           </div>

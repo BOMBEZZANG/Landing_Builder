@@ -74,7 +74,9 @@ export default function InlineTextEditor({
       setIsEditing(false);
       onBlur?.();
     } else if (e.key === 'Enter' && !multiline) {
-      handleBlur();
+      setIsEditing(false);
+      onChange(localValue);
+      onBlur?.();
     }
   };
 

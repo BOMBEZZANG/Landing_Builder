@@ -30,6 +30,7 @@ export interface ContentSection extends BaseSection {
     title: string;
     content: string;
     imageUrl?: string;
+    imagePublicId?: string;
     imagePosition: 'left' | 'right' | 'top' | 'bottom';
     backgroundColor: string;
     textColor: string;

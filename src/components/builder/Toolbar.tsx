@@ -6,16 +6,28 @@ interface ToolbarProps {
   onSave: () => void;
   onPreview: () => void;
   onReset: () => void;
+  onUndo?: () => void;
+  onRedo?: () => void;
+  onShowTemplates?: () => void;
+  onSaveTemplate?: () => void;
   hasUnsavedChanges: boolean;
   isPreviewMode: boolean;
+  canUndo?: boolean;
+  canRedo?: boolean;
 }
 
 export default function Toolbar({
   onSave,
   onPreview,
   onReset,
+  onUndo,
+  onRedo,
+  onShowTemplates,
+  onSaveTemplate,
   hasUnsavedChanges,
-  isPreviewMode
+  isPreviewMode,
+  canUndo = false,
+  canRedo = false
 }: ToolbarProps) {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
@@ -74,6 +86,108 @@ export default function Toolbar({
 
       {/* Right side - Actions */}
       <div className="flex items-center space-x-2">
+        {/* Undo/Redo Buttons */}
+        {!isPreviewMode && (
+          <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onUndo}
+              disabled={!canUndo}
+              className="rounded-none border-0 px-2"
+              title="Undo (Ctrl+Z)"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+                />
+              </svg>
+            </Button>
+            <div className="w-px h-4 bg-gray-200" />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onRedo}
+              disabled={!canRedo}
+              className="rounded-none border-0 px-2"
+              title="Redo (Ctrl+Y)"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6"
+                />
+              </svg>
+            </Button>
+          </div>
+        )}
+        
+        {/* Template Actions */}
+        {!isPreviewMode && (
+          <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onShowTemplates}
+              className="rounded-none border-0 px-3"
+              title="Browse Templates"
+            >
+              <svg
+                className="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                />
+              </svg>
+              Templates
+            </Button>
+            <div className="w-px h-4 bg-gray-200" />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onSaveTemplate}
+              className="rounded-none border-0 px-3"
+              title="Save as Template"
+            >
+              <svg
+                className="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+                />
+              </svg>
+              Save
+            </Button>
+          </div>
+        )}
+        
         {/* Save Button */}
         <Button
           variant={hasUnsavedChanges ? 'primary' : 'secondary'}
