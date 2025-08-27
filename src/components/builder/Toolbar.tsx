@@ -13,7 +13,7 @@ interface ToolbarProps {
   onRedo?: () => void;
   onShowTemplates?: () => void;
   onSaveTemplate?: () => void;
-  onPublish: (settings: PublishSettings) => Promise<any>;
+  onPublish: (settings: PublishSettings) => Promise<unknown>;
   hasUnsavedChanges: boolean;
   isPreviewMode: boolean;
   previewDevice: DeviceType;

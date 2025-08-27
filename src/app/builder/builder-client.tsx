@@ -69,7 +69,7 @@ export default function BuilderClient() {
     }
   };
 
-  const handleUpdateSection = (sectionId: string, updates: any) => {
+  const handleUpdateSection = (sectionId: string, updates: Record<string, unknown>) => {
     updateSection(sectionId, updates);
   };
 
@@ -78,7 +78,7 @@ export default function BuilderClient() {
     setShowTemplateSelector(false);
   };
 
-  const handleSaveTemplate = (templateId: string) => {
+  const handleSaveTemplate = (_templateId: string) => {
     setShowSaveTemplate(false);
     // Could show a success message here
   };

@@ -25,7 +25,6 @@ import { cn } from '@/lib/utils';
 import HeroSection from '@/components/sections/HeroSection';
 import ContentSection from '@/components/sections/ContentSection';
 import CTASection from '@/components/sections/CTASection';
-import DndProvider from '@/components/builder/DndProvider';
 import { GripVertical } from 'lucide-react';
 
 interface DraggableSectionProps {

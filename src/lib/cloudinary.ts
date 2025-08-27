@@ -190,7 +190,7 @@ export class CloudinaryService {
       return url; // Return original URL if not a Cloudinary URL
     }
 
-    let transformations: string[] = [];
+    const transformations: string[] = [];
 
     // Quality
     const quality = options.quality || 'auto';

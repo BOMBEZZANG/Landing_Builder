@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { Section, PageState, BuilderState, DeviceType } from '@/types/builder.types';
-import { v4 as uuidv4 } from 'uuid';
 
 interface HistoryState {
   past: PageState[];

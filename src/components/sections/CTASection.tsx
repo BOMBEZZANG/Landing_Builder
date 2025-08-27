@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { CTASection as CTASectionType } from '@/types/builder.types';
-import { cn } from '@/lib/utils';
 import InlineTextEditor from '@/components/editor/InlineTextEditor';
 
 interface CTASectionProps {
