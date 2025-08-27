@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { htmlGenerator } from '@/lib/html-generator';
+import { HTMLGenerator } from '@/lib/html-generator/index';
 import { githubService } from '@/lib/github-service';
 import { PageState } from '@/types/builder.types';
 
@@ -67,7 +67,8 @@ export async function POST(request: NextRequest) {
     const options = { ...defaultOptions, ...body.options };
 
     // Step 1: Generate HTML
-    const htmlResult = await htmlGenerator.generateHTML(body.page, options);
+    const generator = new HTMLGenerator(options);
+    const htmlResult = await generator.generate(body.page);
 
     if (!htmlResult.html) {
       throw new Error('HTML generation failed');
@@ -101,7 +102,7 @@ export async function POST(request: NextRequest) {
         htmlSize: htmlResult.size,
         htmlSizeFormatted: formatFileSize(htmlResult.size),
         warnings: htmlResult.warnings,
-        assets: htmlResult.assets,
+        metadata: htmlResult.metadata,
         deployedAt: new Date().toISOString()
       }
     });

@@ -76,7 +76,15 @@ const defaultSections: Section[] = [
         phone: true
       },
       buttonText: 'Get Started Now',
+      // Email recipient settings
       recipientEmail: '',
+      emailVerified: false,
+      // Optional email settings
+      sendCopyToSubmitter: false,
+      emailSubject: 'New form submission from your landing page',
+      enableGoogleSheets: false,
+      googleSheetId: '',
+      // Style fields
       backgroundColor: '#f3f4f6',
       textColor: '#1f2937',
       buttonColor: '#3b82f6'
@@ -233,11 +241,31 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
       get().saveToHistory();
       
       set((state) => {
-        const updatedSections = state.page.sections.map((section) =>
-          section.id === sectionId
-            ? { ...section, data: { ...section.data, ...updates } as any }
-            : section
-        );
+        const updatedSections = state.page.sections.map((section) => {
+          if (section.id === sectionId) {
+            // Special handling for email verification reset on email change
+            if ('recipientEmail' in updates && section.type === 'cta') {
+              const currentEmail = (section.data as any).recipientEmail;
+              const newEmail = updates.recipientEmail;
+              
+              if (currentEmail !== newEmail) {
+                return {
+                  ...section,
+                  data: {
+                    ...section.data,
+                    ...updates,
+                    emailVerified: false // Reset verification when email changes
+                  } as any
+                };
+              }
+            }
+            return {
+              ...section,
+              data: { ...section.data, ...updates } as any
+            };
+          }
+          return section;
+        });
         
         const newPage = {
           ...state.page,

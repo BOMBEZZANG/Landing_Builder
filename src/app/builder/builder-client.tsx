@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useBuilderStore, startAutoSave, stopAutoSave } from '@/store/builderStore';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { Template } from '@/types/template.types';
+import { PublishSettings } from '@/types/builder.types';
 import BuilderLayout from '@/components/builder/BuilderLayout';
 import Toolbar from '@/components/builder/Toolbar';
 import SectionList from '@/components/builder/SectionList';
@@ -80,6 +81,77 @@ export default function BuilderClient() {
     // Could show a success message here
   };
 
+  const handlePublish = async (settings: PublishSettings) => {
+    console.log('Publishing page:', page);
+    console.log('Publish settings:', settings);
+    
+    // Ensure settings object exists with defaults
+    const safeSettings = settings || {
+      userId: 'user-' + Date.now(),
+      enableAnalytics: false,
+      formService: 'formspree' as const,
+      optimizations: {
+        minify: true,
+        optimizeImages: true,
+        includeAnimations: true
+      }
+    };
+    
+    try {
+      // Call the deploy API endpoint
+      const response = await fetch('/api/deploy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          page: page,
+          userId: safeSettings.userId || 'user-' + Date.now(),
+          pageId: safeSettings.pageId || generatePageId(page.title),
+          options: {
+            minify: safeSettings.optimizations?.minify || true,
+            inlineCSS: true,
+            includeAnalytics: safeSettings.enableAnalytics || false,
+            includeMeta: true,
+            includeAnimations: safeSettings.optimizations?.includeAnimations || true,
+            optimizeImages: safeSettings.optimizations?.optimizeImages || true,
+            formService: safeSettings.formService || 'formspree'
+          }
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Publishing failed');
+      }
+
+      if (result.success) {
+        console.log('Publishing successful:', result.data);
+        // The PublishModal will handle showing the success state
+        return result.data;
+      } else {
+        throw new Error(result.error || 'Publishing failed');
+      }
+    } catch (error) {
+      console.error('Publishing error:', error);
+      throw error;
+    }
+  };
+  
+  // Helper function to generate page ID
+  const generatePageId = (title: string): string => {
+    const timestamp = Date.now();
+    const cleanTitle = title
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .substring(0, 30);
+    
+    return `${cleanTitle}-${timestamp}`;
+  };
+
   const selectedSection = selectedSectionId 
     ? page.sections.find(s => s.id === selectedSectionId) || null
     : null;
@@ -93,10 +165,12 @@ export default function BuilderClient() {
       onRedo={redo}
       onShowTemplates={() => setShowTemplateSelector(true)}
       onSaveTemplate={() => setShowSaveTemplate(true)}
+      onPublish={handlePublish}
       hasUnsavedChanges={hasUnsavedChanges}
       isPreviewMode={isPreviewMode}
       canUndo={canUndo}
       canRedo={canRedo}
+      page={page}
     />
   );
 

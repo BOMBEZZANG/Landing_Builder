@@ -293,6 +293,9 @@ export class HTMLGenerator {
     css += `
       body {
         font-family: ${fontFamily};
+        color: #333333;
+        line-height: 1.6;
+        overflow-x: hidden;
       }
     `;
     
@@ -301,6 +304,85 @@ export class HTMLGenerator {
       :root {
         --primary-color: ${page.globalStyles.primaryColor};
         --secondary-color: ${page.globalStyles.secondaryColor};
+        --text-dark: #1f2937;
+        --text-light: #6b7280;
+        --bg-light: #f9fafb;
+        --border-color: #e5e7eb;
+      }
+    `;
+
+    // Enhanced responsive form styles
+    css += `
+      .form-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        max-width: 500px;
+        margin: 0 auto;
+      }
+      
+      .form-field {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 16px;
+        font-family: inherit;
+        transition: all 0.3s ease;
+        background: white;
+      }
+      
+      .form-field:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+      
+      .form-field:invalid {
+        border-color: #dc2626;
+      }
+      
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 28px;
+        font-size: 16px;
+        font-weight: 600;
+        text-align: center;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        min-height: 48px;
+        font-family: inherit;
+      }
+      
+      .btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      }
+      
+      .btn:active {
+        transform: translateY(0);
+      }
+      
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+      
+      @media (max-width: 768px) {
+        .btn {
+          width: 100%;
+          padding: 16px 24px;
+        }
+        
+        .form-field {
+          font-size: 16px; /* Prevents zoom on iOS */
+        }
       }
     `;
 
@@ -318,8 +400,68 @@ export class HTMLGenerator {
         .animate-slide-in-right {
           animation: slideInRight 0.8s ease-out;
         }
+        
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes slideInLeft {
+          from {
+            opacity: 0;
+            transform: translateX(-50px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        
+        @keyframes slideInRight {
+          from {
+            opacity: 0;
+            transform: translateX(50px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
       `;
     }
+    
+    // Accessibility and performance optimizations
+    css += `
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+      
+      /* Print styles */
+      @media print {
+        .hero-section {
+          min-height: auto !important;
+        }
+        
+        .btn,
+        .form-container {
+          display: none !important;
+        }
+        
+        * {
+          color: black !important;
+          background: white !important;
+        }
+      }
+    `;
     
     return css;
   }
@@ -398,9 +540,19 @@ export class HTMLGenerator {
   }
 
   private escapeHtml(text: string): string {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+    if (typeof window !== 'undefined') {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    } else {
+      // Server-side HTML escaping
+      return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
   }
 
   private extractImageUrls(html: string): string[] {

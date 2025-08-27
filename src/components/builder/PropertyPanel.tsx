@@ -5,6 +5,7 @@ import ColorPicker from '@/components/editor/ColorPicker';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
+import { EmailSettingsSection } from '@/components/builder/PropertyPanels/EmailSettingsSection';
 
 interface PropertyPanelProps {
   selectedSection: Section | null;
@@ -206,59 +207,61 @@ export default function PropertyPanel({
             <span className="ml-2 text-sm text-gray-700">Enable form</span>
           </label>
         </div>
-        
-        {section.data.formEnabled && (
-          <>
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-gray-700">Form Fields</p>
-              
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={section.data.formFields.name}
-                  onChange={(e) => onUpdateSection({
-                    formFields: { ...section.data.formFields, name: e.target.checked }
-                  })}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="ml-2 text-sm text-gray-700">Name field</span>
-              </label>
-              
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={section.data.formFields.email}
-                  onChange={(e) => onUpdateSection({
-                    formFields: { ...section.data.formFields, email: e.target.checked }
-                  })}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="ml-2 text-sm text-gray-700">Email field</span>
-              </label>
-              
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={section.data.formFields.phone}
-                  onChange={(e) => onUpdateSection({
-                    formFields: { ...section.data.formFields, phone: e.target.checked }
-                  })}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="ml-2 text-sm text-gray-700">Phone field</span>
-              </label>
-            </div>
-            
-            <Input
-              label="Recipient Email"
-              value={section.data.recipientEmail}
-              onChange={(e) => onUpdateSection({ recipientEmail: e.target.value })}
-              placeholder="your@email.com"
-              type="email"
-            />
-          </>
-        )}
       </PropertyGroup>
+
+      {/* Email Recipient Settings - Always show when form is enabled */}
+      {section.data.formEnabled && (
+        <EmailSettingsSection
+          recipientEmail={section.data.recipientEmail || ''}
+          emailVerified={section.data.emailVerified || false}
+          onEmailChange={(email) => onUpdateSection({ recipientEmail: email })}
+          onEmailVerified={(verified) => onUpdateSection({ emailVerified: verified })}
+        />
+      )}
+
+      {section.data.formEnabled && (
+        <PropertyGroup title="Form Fields">
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-gray-700">Select fields to show on your form</p>
+            
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={section.data.formFields.name}
+                onChange={(e) => onUpdateSection({
+                  formFields: { ...section.data.formFields, name: e.target.checked }
+                })}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="ml-2 text-sm text-gray-700">Name field</span>
+            </label>
+            
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={section.data.formFields.email}
+                onChange={(e) => onUpdateSection({
+                  formFields: { ...section.data.formFields, email: e.target.checked }
+                })}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="ml-2 text-sm text-gray-700">Email field</span>
+            </label>
+            
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={section.data.formFields.phone}
+                onChange={(e) => onUpdateSection({
+                  formFields: { ...section.data.formFields, phone: e.target.checked }
+                })}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="ml-2 text-sm text-gray-700">Phone field</span>
+            </label>
+          </div>
+        </PropertyGroup>
+      )}
     </>
   );
 

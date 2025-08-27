@@ -61,6 +61,7 @@ const BUILT_IN_TEMPLATES: Omit<Template, 'id' | 'createdAt' | 'updatedAt'>[] = [
             },
             buttonText: 'Start Free Trial',
             recipientEmail: '',
+            emailVerified: false,
             backgroundColor: '#f8fafc',
             textColor: '#1f2937',
             buttonColor: '#1e3a8a'
@@ -134,6 +135,7 @@ const BUILT_IN_TEMPLATES: Omit<Template, 'id' | 'createdAt' | 'updatedAt'>[] = [
             },
             buttonText: 'Get Started Now',
             recipientEmail: '',
+            emailVerified: false,
             backgroundColor: '#f3f4f6',
             textColor: '#1f2937',
             buttonColor: '#6366f1'
@@ -207,6 +209,7 @@ const BUILT_IN_TEMPLATES: Omit<Template, 'id' | 'createdAt' | 'updatedAt'>[] = [
             },
             buttonText: 'Get In Touch',
             recipientEmail: '',
+            emailVerified: false,
             backgroundColor: '#1f2937',
             textColor: '#ffffff',
             buttonColor: '#f59e0b'
@@ -280,6 +283,7 @@ const BUILT_IN_TEMPLATES: Omit<Template, 'id' | 'createdAt' | 'updatedAt'>[] = [
             },
             buttonText: 'Claim Discount',
             recipientEmail: '',
+            emailVerified: false,
             backgroundColor: '#fef3c7',
             textColor: '#1f2937',
             buttonColor: '#dc2626'

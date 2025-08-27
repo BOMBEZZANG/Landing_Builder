@@ -119,7 +119,7 @@ export class GitHubService {
       return {
         success: true,
         commitSha: commitResult.sha,
-        url: netlifyUrl || githubPagesUrl,
+        url: githubPagesUrl, // Use GitHub Pages as primary URL
         deploymentId: `${cleanUserId}/${cleanPageId}`,
         netlifyUrl: netlifyUrl || undefined
       };
@@ -315,14 +315,15 @@ export class GitHubService {
     message: string
   ): Promise<{ success: boolean; sha?: string; error?: string }> {
     try {
-      // Get the current commit SHA
+      // Get the current commit SHA and tree SHA
       const branchResponse = await this.octokit.repos.getBranch({
         owner: this.config.owner,
         repo: this.config.repo,
         branch: this.config.branch
       });
 
-      const baseTreeSha = branchResponse.data.commit.sha;
+      const baseCommitSha = branchResponse.data.commit.sha;
+      const baseTreeSha = branchResponse.data.commit.commit.tree.sha;
 
       // Create blobs for each file
       const blobPromises = files.map(async (file) => {
@@ -357,7 +358,7 @@ export class GitHubService {
         repo: this.config.repo,
         message,
         tree: treeResponse.data.sha,
-        parents: [baseTreeSha]
+        parents: [baseCommitSha]
       });
 
       // Update branch reference
@@ -387,9 +388,9 @@ export class GitHubService {
 
   private async getNetlifyUrl(userId: string, pageId: string): Promise<string | null> {
     try {
-      // This would integrate with Netlify API if configured
-      // For now, return null to fall back to GitHub Pages URL
-      return null;
+      // Generate Netlify URL based on the deployment pattern
+      // The Netlify site is connected to the GitHub repository
+      return `https://landing-pages-deploy.netlify.app/sites/${userId}/${pageId}`;
     } catch (error) {
       return null;
     }

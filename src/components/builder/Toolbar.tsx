@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { PageState, PublishSettings } from '@/types/builder.types';
+import { validateForPublishing } from '@/utils/validation';
 import Button from '@/components/ui/Button';
+import { PublishModal } from '@/components/builder/PublishModal';
 
 interface ToolbarProps {
   onSave: () => void;
@@ -10,10 +13,12 @@ interface ToolbarProps {
   onRedo?: () => void;
   onShowTemplates?: () => void;
   onSaveTemplate?: () => void;
+  onPublish: (settings: PublishSettings) => Promise<any>;
   hasUnsavedChanges: boolean;
   isPreviewMode: boolean;
   canUndo?: boolean;
   canRedo?: boolean;
+  page: PageState;
 }
 
 export default function Toolbar({
@@ -24,12 +29,15 @@ export default function Toolbar({
   onRedo,
   onShowTemplates,
   onSaveTemplate,
+  onPublish,
   hasUnsavedChanges,
   isPreviewMode,
   canUndo = false,
-  canRedo = false
+  canRedo = false,
+  page
 }: ToolbarProps) {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showPublishModal, setShowPublishModal] = useState(false);
 
   const handleReset = () => {
     if (showResetConfirm) {
@@ -41,6 +49,20 @@ export default function Toolbar({
       setTimeout(() => setShowResetConfirm(false), 3000);
     }
   };
+
+  const handlePublishClick = () => {
+    setShowPublishModal(true);
+  };
+
+  const handlePublish = async (settings: PublishSettings) => {
+    const result = await onPublish(settings);
+    setShowPublishModal(false);
+    return result;
+  };
+
+  // Check if page can be published
+  const validation = validateForPublishing(page);
+  const canPublish = validation.canPublish;
 
   return (
     <div className="flex items-center justify-between h-full px-4">
@@ -306,12 +328,15 @@ export default function Toolbar({
           )}
         </Button>
 
-        {/* Publish Button - Placeholder for Phase 2 */}
+        {/* Publish Button */}
         <Button
-          variant="primary"
+          variant={canPublish ? "primary" : "outline"}
           size="sm"
-          disabled
-          className="opacity-50"
+          onClick={handlePublishClick}
+          className={cn(
+            !canPublish && "border-red-300 text-red-600 hover:border-red-400 hover:text-red-700"
+          )}
+          title={canPublish ? "Publish your landing page" : "Fix validation errors to publish"}
         >
           <svg
             className="w-4 h-4 mr-2"
@@ -329,6 +354,14 @@ export default function Toolbar({
           Publish
         </Button>
       </div>
+
+      {/* Publish Modal */}
+      <PublishModal
+        isOpen={showPublishModal}
+        onClose={() => setShowPublishModal(false)}
+        page={page}
+        onPublish={handlePublish}
+      />
     </div>
   );
 }

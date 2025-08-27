@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { htmlGenerator } from '@/lib/html-generator';
+import { HTMLGenerator } from '@/lib/html-generator/index';
 import { PageState } from '@/types/builder.types';
 
 interface GenerateHtmlRequest {
@@ -53,19 +53,18 @@ export async function POST(request: NextRequest) {
     const options = { ...defaultOptions, ...body.options };
 
     // Generate HTML
-    const result = await htmlGenerator.generateHTML(body.page, options);
+    const generator = new HTMLGenerator(options);
+    const result = await generator.generate(body.page);
 
     // Return success response
     return NextResponse.json({
       success: true,
       data: {
         html: result.html,
-        css: result.css,
-        js: result.js,
         size: result.size,
         sizeFormatted: formatFileSize(result.size),
         warnings: result.warnings,
-        assets: result.assets,
+        metadata: result.metadata,
         generatedAt: new Date().toISOString()
       }
     });

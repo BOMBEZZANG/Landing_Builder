@@ -50,7 +50,17 @@ export interface CTASection extends BaseSection {
       phone: boolean;
     };
     buttonText: string;
-    recipientEmail: string;
+    // Email recipient settings
+    recipientEmail: string;        // Required: Where to send submissions
+    emailVerified: boolean;        // Has email been verified via test
+    
+    // Optional email settings
+    sendCopyToSubmitter?: boolean; // Send confirmation to form submitter
+    emailSubject?: string;          // Custom email subject line
+    enableGoogleSheets?: boolean;   // Google Sheets integration flag
+    googleSheetId?: string;         // Google Sheet ID if enabled
+    
+    // Style fields
     backgroundColor: string;
     textColor: string;
     buttonColor: string;
@@ -150,3 +160,91 @@ export const PADDING_OPTIONS: PaddingOption[] = [
   { name: 'Medium', value: 'medium', className: 'py-16' },
   { name: 'Large', value: 'large', className: 'py-24' },
 ];
+
+// Validation Types
+export interface ValidationResult {
+  isValid: boolean;
+  error?: string;
+  warning?: string;
+}
+
+export interface PublishValidationResult {
+  canPublish: boolean;
+  errors: string[];
+  warnings: string[];
+}
+
+// HTML Generation Types
+export interface GeneratorOptions {
+  minify?: boolean;
+  inlineCSS?: boolean;
+  includeAnalytics?: boolean;
+  formService?: 'formspree' | 'custom' | 'netlify-forms';
+  includeAnimations?: boolean;
+  optimizeImages?: boolean;
+}
+
+export interface GeneratedOutput {
+  html: string;
+  size: number;
+  warnings: string[];
+  metadata: {
+    generatedAt: string;
+    version: string;
+    checksum: string;
+  };
+}
+
+export interface HTMLValidationResult {
+  isValid: boolean;
+  errors: string[];
+}
+
+export interface PerformanceAnalysis {
+  size: number;
+  estimatedLoadTime: number;
+  recommendations: string[];
+}
+
+// Deployment Types
+export interface DeploymentResult {
+  success: boolean;
+  url?: string;
+  commitSha?: string;
+  error?: string;
+  deploymentId?: string;
+  netlifyUrl?: string;
+}
+
+export interface DeploymentConfig {
+  owner: string;
+  repo: string;
+  branch: string;
+  token: string;
+}
+
+export interface DeploymentStatus {
+  isDeploying: boolean;
+  deploymentId?: string;
+  url?: string;
+  githubPagesUrl?: string;
+  netlifyUrl?: string;
+  repoUrl?: string;
+  error?: string;
+  progress?: number;
+  lastDeployedAt?: string;
+}
+
+// Page Publishing Types
+export interface PublishSettings {
+  userId: string;
+  pageId?: string;
+  customDomain?: string;
+  enableAnalytics: boolean;
+  formService: 'formspree' | 'custom' | 'netlify-forms';
+  optimizations: {
+    minify: boolean;
+    optimizeImages: boolean;
+    includeAnimations: boolean;
+  };
+}
