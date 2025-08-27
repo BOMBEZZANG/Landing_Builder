@@ -176,6 +176,7 @@ function generateNetlifyHandler(ctaSection: CTASection): string {
 }
 
 function generateCustomHandler(ctaSection: CTASection): string {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
   return `
     (function() {
       const form = document.getElementById('contact-form');
@@ -220,7 +221,9 @@ function generateCustomHandler(ctaSection: CTASection): string {
         };
         
         try {
-          const response = await fetch('/api/submit-form', {
+          // Use the API endpoint - can be configured for production deployment  
+          const apiEndpoint = '${apiUrl}/api/submit-form';
+          const response = await fetch(apiEndpoint, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'

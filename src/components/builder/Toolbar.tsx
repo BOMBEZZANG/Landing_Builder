@@ -55,9 +55,15 @@ export default function Toolbar({
   };
 
   const handlePublish = async (settings: PublishSettings) => {
-    const result = await onPublish(settings);
-    setShowPublishModal(false);
-    return result;
+    try {
+      const result = await onPublish(settings);
+      // Don't close the modal here - let the PublishModal handle its own state
+      // The modal will show the success state and let user close it manually
+      return result;
+    } catch (error) {
+      // On error, also don't close modal - let it show the error state
+      throw error;
+    }
   };
 
   // Check if page can be published

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, CheckCircle, Mail, X, ExternalLink, Settings, Globe, Zap } from 'lucide-react';
+import { AlertCircle, CheckCircle, Mail, X, ExternalLink, Settings, Globe, Zap, Copy, Check } from 'lucide-react';
 import { PageState, PublishSettings, DeploymentStatus, PublishValidationResult } from '@/types/builder.types';
 import { validateForPublishing } from '@/utils/validation';
 import Button from '@/components/ui/Button';
@@ -26,6 +26,7 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
     }
   });
   const [currentStep, setCurrentStep] = useState<'validation' | 'settings' | 'deploying' | 'success'>('validation');
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -50,11 +51,14 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
     try {
       const result = await onPublish(publishSettings);
       console.log('Publish result:', result);
+      console.log('Result has URL:', !!result?.url);
+      console.log('Result has netlifyUrl:', !!result?.netlifyUrl);
       
-      if (result && result.url) {
+      if (result && (result.url || result.netlifyUrl)) {
         setDeploymentStatus({
           isDeploying: false,
           url: result.url,
+          netlifyUrl: result.netlifyUrl,
           deploymentId: result.deploymentId,
           lastDeployedAt: new Date().toISOString()
         });
@@ -84,6 +88,34 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
     if (currentStep === 'settings') {
       setCurrentStep('validation');
     }
+  };
+
+  const copyToClipboard = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedUrl(url);
+      setTimeout(() => setCopiedUrl(null), 2000); // Reset after 2 seconds
+    } catch (error) {
+      console.error('Failed to copy URL:', error);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = url;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopiedUrl(url);
+      setTimeout(() => setCopiedUrl(null), 2000);
+    }
+  };
+
+  // Format URL to match the requested format: https://landing-pages-deploy.netlify.app/{userId}/{pageId}/
+  const getDisplayUrl = (deploymentStatus: DeploymentStatus) => {
+    if (deploymentStatus.netlifyUrl) {
+      // Remove '/sites/' from the netlify URL to match your requested format
+      return deploymentStatus.netlifyUrl.replace('/sites/', '/');
+    }
+    return deploymentStatus.url || '';
   };
 
   if (!isOpen) return null;
@@ -353,15 +385,15 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
               {deploymentStatus && (
                 <div className="space-y-4">
                   {/* Primary URL */}
-                  {deploymentStatus.url && (
+                  {(deploymentStatus.url || deploymentStatus.netlifyUrl) && (
                     <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center space-x-2">
                           <Globe className="w-5 h-5 text-green-600" />
-                          <span className="font-medium text-green-900">Primary URL:</span>
+                          <span className="font-medium text-green-900">Your Landing Page URL:</span>
                         </div>
                         <a
-                          href={deploymentStatus.url}
+                          href={getDisplayUrl(deploymentStatus)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center space-x-1 text-blue-600 hover:text-blue-700 font-medium"
@@ -370,53 +402,35 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
                           <ExternalLink className="w-4 h-4" />
                         </a>
                       </div>
-                      <div className="mt-2 text-sm text-green-700 font-mono bg-green-100 rounded px-2 py-1 break-all">
-                        {deploymentStatus.url}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* GitHub Pages URL */}
-                  {deploymentStatus.githubPagesUrl && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <Globe className="w-5 h-5 text-blue-600" />
-                          <span className="font-medium text-blue-900">GitHub Pages:</span>
+                      <div className="flex items-center space-x-2 p-3 bg-green-100 rounded-lg">
+                        <div className="flex-1 text-sm text-green-800 font-mono break-all">
+                          {getDisplayUrl(deploymentStatus)}
                         </div>
-                        <a
-                          href={deploymentStatus.githubPagesUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center space-x-1 text-blue-600 hover:text-blue-700 font-medium"
+                        <button
+                          onClick={() => copyToClipboard(getDisplayUrl(deploymentStatus))}
+                          className="flex items-center justify-center w-8 h-8 text-green-600 hover:text-green-700 hover:bg-green-200 rounded-md transition-colors"
+                          title="Copy URL"
                         >
-                          <span>View Page</span>
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
+                          {copiedUrl === getDisplayUrl(deploymentStatus) ? (
+                            <Check className="w-4 h-4" />
+                          ) : (
+                            <Copy className="w-4 h-4" />
+                          )}
+                        </button>
                       </div>
-                      <div className="mt-2 text-sm text-blue-700 font-mono bg-blue-100 rounded px-2 py-1 break-all">
-                        {deploymentStatus.githubPagesUrl}
-                      </div>
+                      {copiedUrl === getDisplayUrl(deploymentStatus) && (
+                        <div className="mt-2 text-xs text-green-600 font-medium">✓ URL copied to clipboard!</div>
+                      )}
                     </div>
                   )}
 
-                  {/* Repository Link */}
-                  {deploymentStatus.repoUrl && (
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-700">Source Repository:</span>
-                        <a
-                          href={deploymentStatus.repoUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center space-x-1 text-gray-600 hover:text-gray-700 text-sm"
-                        >
-                          <span>View Code</span>
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                      </div>
+
+                  {/* Additional Info */}
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                    <div className="text-center text-sm text-gray-600">
+                      🎉 Your landing page is now live! Share this URL to get visitors.
                     </div>
-                  )}
+                  </div>
                 </div>
               )}
             </div>
@@ -490,10 +504,10 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
                 Close
               </Button>
               
-              {deploymentStatus?.url && (
+              {(deploymentStatus?.url || deploymentStatus?.netlifyUrl) && (
                 <Button
                   variant="primary"
-                  onClick={() => window.open(deploymentStatus.url, '_blank')}
+                  onClick={() => window.open(getDisplayUrl(deploymentStatus), '_blank')}
                   className="flex items-center space-x-2"
                 >
                   <ExternalLink className="w-4 h-4" />

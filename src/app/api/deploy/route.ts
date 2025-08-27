@@ -61,7 +61,8 @@ export async function POST(request: NextRequest) {
       includeAnalytics: process.env.NEXT_PUBLIC_GA_ID ? true : false,
       includeMeta: true,
       includeAnimations: true,
-      optimizeImages: true
+      optimizeImages: true,
+      formService: 'custom' // Use custom API for form submissions
     };
 
     const options = { ...defaultOptions, ...body.options };
