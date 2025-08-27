@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useDropzone, FileRejection, DropzoneOptions } from 'react-dropzone';
 import { cn } from '@/lib/utils';
 import { compressImage, getFileSizeReduction } from '@/lib/imageUtils';
@@ -33,7 +33,6 @@ export default function ImageUploader({
     error: null
   });
   const [preview, setPreview] = useState<string | null>(currentImage || null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Handle file upload
   const handleFileUpload = useCallback(async (files: File[]) => {
@@ -48,20 +47,17 @@ export default function ImageUploader({
     });
 
     try {
-      // Create preview
+      // Create preview immediately
       const previewUrl = URL.createObjectURL(file);
       setPreview(previewUrl);
 
-      // Compress image before upload (save bandwidth & storage)
-      console.log('Original file size:', file.size, 'bytes');
+      // Compress image before upload
       const compressedFile = await compressImage(file, {
         maxWidth: 1920,
         maxHeight: 1080,
         quality: 0.85,
         format: 'jpeg'
       });
-      console.log('Compressed file size:', compressedFile.size, 'bytes');
-      console.log('Size reduction:', getFileSizeReduction(file.size, compressedFile.size));
 
       // Create form data with compressed file
       const formData = new FormData();
@@ -96,7 +92,6 @@ export default function ImageUploader({
       // Clean up preview URL
       URL.revokeObjectURL(previewUrl);
     } catch (error) {
-      console.error('Upload failed:', error);
       setUploadState({
         isUploading: false,
         progress: 0,
@@ -145,61 +140,11 @@ export default function ImageUploader({
       'image/*': ['.jpeg', '.jpg', '.png', '.webp', '.gif']
     },
     maxFiles: 1,
-    maxSize: maxSize * 1024 * 1024, // Convert MB to bytes
-    disabled: disabled || uploadState.isUploading,
-    noClick: true, // Disable dropzone's default click behavior to avoid conflicts
-    noKeyboard: true // Disable keyboard interactions for dropzone
+    maxSize: maxSize * 1024 * 1024,
+    disabled: disabled || uploadState.isUploading
   };
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone(dropzoneOptions);
-
-  // Handle manual file selection
-  const handleBrowseClick = (e?: React.MouseEvent) => {
-    console.log('🔍 handleBrowseClick called');
-    e?.preventDefault();
-    e?.stopPropagation();
-    console.log('Browse button clicked, fileInputRef:', fileInputRef.current);
-    
-    if (fileInputRef.current) {
-      console.log('🚀 Attempting to click file input');
-      try {
-        // Temporarily make input more visible to avoid browser security blocks
-        const input = fileInputRef.current;
-        const originalStyle = input.style.cssText;
-        
-        // Make input temporarily visible but off-screen
-        input.style.cssText = 'position: fixed; left: -1000px; top: -1000px; width: 1px; height: 1px; opacity: 0.01;';
-        
-        // Click the input
-        input.click();
-        
-        // Restore original styles after a brief delay
-        setTimeout(() => {
-          input.style.cssText = originalStyle;
-        }, 100);
-        
-        console.log('✅ File input click triggered with visibility fix');
-      } catch (error) {
-        console.error('❌ Error clicking file input:', error);
-      }
-    } else {
-      console.log('❌ File input ref not found');
-    }
-  };
-
-  // Handle file input change
-  const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('File input changed');
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      console.log('File selected:', files[0].name);
-      handleFileUpload([files[0]]);
-      // Clear the input value to allow re-selecting the same file
-      event.target.value = '';
-    } else {
-      console.log('No files selected');
-    }
-  };
+  const { getRootProps, getInputProps, isDragActive, open } = useDropzone(dropzoneOptions);
 
   // Handle remove image
   const handleRemoveImage = () => {
@@ -230,11 +175,13 @@ export default function ImageUploader({
     <div className={cn('w-full', className)}>
       {/* Upload Area */}
       <div
-        {...getRootProps()}
-        onClick={(e) => {
-          console.log('📦 Upload area clicked');
-          handleBrowseClick(e);
-        }}
+        {...getRootProps({
+          onClick: (e) => {
+            console.log('📍 Upload area clicked!');
+            console.log('Event target:', e.target);
+            console.log('Current target:', e.currentTarget);
+          }
+        })}
         className={cn(
           'relative border-2 border-dashed rounded-lg transition-all duration-200 cursor-pointer',
           getAspectRatioClass(),
@@ -246,21 +193,8 @@ export default function ImageUploader({
           }
         )}
       >
-        {/* File input - positioned off-screen instead of hidden to avoid browser security blocks */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleFileInputChange}
-          style={{
-            position: 'absolute',
-            left: '-9999px',
-            width: '1px',
-            height: '1px',
-            opacity: 0,
-            pointerEvents: 'none'
-          }}
-        />
+        {/* File input handled by dropzone */}
+        <input {...getInputProps()} />
 
         {/* Preview Image */}
         {preview && !uploadState.isUploading && (
@@ -277,7 +211,7 @@ export default function ImageUploader({
                   size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleBrowseClick();
+                    // Let the parent div's click handler (dropzone) handle file selection
                   }}
                 >
                   Replace
@@ -350,38 +284,31 @@ export default function ImageUploader({
         </div>
       )}
 
-      {/* Manual Browse Button */}
+      {/* Browse Files Button */}
       {!preview && !uploadState.isUploading && (
-        <div className="mt-3 text-center space-y-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={(e) => {
-              console.log('🔘 Browse Files button clicked');
-              handleBrowseClick(e);
-            }}
-            disabled={disabled}
-          >
-            Browse Files
-          </Button>
-          
-          {/* Debug Test Button */}
+        <div className="mt-3 text-center">
           <button
             type="button"
             onClick={() => {
-              console.log('🧪 Test button clicked');
-              console.log('FileInputRef current:', fileInputRef.current);
-              if (fileInputRef.current) {
-                console.log('🧪 Direct click attempt');
-                fileInputRef.current.click();
-              }
+              const input = document.createElement('input');
+              input.type = 'file';
+              input.accept = 'image/*';
+              input.onchange = (e) => {
+                const target = e.target as HTMLInputElement;
+                if (target.files && target.files.length > 0) {
+                  handleFileUpload(Array.from(target.files));
+                }
+              };
+              input.click();
             }}
-            className="block mx-auto text-xs text-gray-500 underline"
+            disabled={disabled}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            [DEBUG] Test File Input
+            Browse Files
           </button>
         </div>
       )}
+
     </div>
   );
 }
