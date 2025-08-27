@@ -144,6 +144,8 @@ This is a test email from Landing Page Builder. If you didn't request this, plea
           errorMessage = 'Email domain not verified. Please verify your domain in Resend.';
         } else if (error.message.includes('rate limit')) {
           errorMessage = 'Rate limit exceeded. Please try again in a moment.';
+        } else if (error.message.includes('testing emails') || error.statusCode === 403) {
+          errorMessage = 'Email service is in testing mode. Please verify your domain at resend.com/domains or contact the administrator.';
         } else {
           errorMessage = `Resend API error: ${error.message}`;
         }

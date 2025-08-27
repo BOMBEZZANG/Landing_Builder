@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Mail, AlertCircle, Send, CheckCircle, Info } from 'lucide-react';
+import { Mail, AlertCircle, Check, CheckCircle, Info } from 'lucide-react';
 import { validateEmail, debounce } from '@/utils/validation';
 
 interface EmailSettingsSectionProps {
@@ -9,7 +9,7 @@ interface EmailSettingsSectionProps {
   onEmailVerified: (verified: boolean) => void;
 }
 
-type TestStatus = 'idle' | 'sending' | 'success' | 'error';
+type ApplyStatus = 'idle' | 'applying' | 'success' | 'error';
 
 export function EmailSettingsSection({
   recipientEmail,
@@ -17,7 +17,7 @@ export function EmailSettingsSection({
   onEmailChange,
   onEmailVerified
 }: EmailSettingsSectionProps) {
-  const [status, setStatus] = useState<TestStatus>('idle');
+  const [status, setStatus] = useState<ApplyStatus>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [validationMessage, setValidationMessage] = useState('');
   const [showWarning, setShowWarning] = useState(false);
@@ -64,7 +64,7 @@ export function EmailSettingsSection({
     }
   };
 
-  const handleTestEmail = async () => {
+  const handleApplyEmail = async () => {
     const validation = validateEmail(recipientEmail);
     if (!validation.isValid) {
       setErrorMessage(validation.error || 'Invalid email');
@@ -72,33 +72,17 @@ export function EmailSettingsSection({
       return;
     }
     
-    setStatus('sending');
+    setStatus('applying');
     setErrorMessage('');
     
-    try {
-      const response = await fetch('/api/test-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: recipientEmail })
-      });
-      
-      const data = await response.json();
-      
-      if (response.ok && data.success) {
-        setStatus('success');
-        onEmailVerified(true);
-        // Reset to idle after 3 seconds
-        setTimeout(() => setStatus('idle'), 3000);
-      } else {
-        setErrorMessage(data.error || 'Failed to send test email');
-        setStatus('error');
-        setTimeout(() => setStatus('idle'), 3000);
-      }
-    } catch (error) {
-      setErrorMessage('Network error. Please check your connection and try again.');
-      setStatus('error');
-      setTimeout(() => setStatus('idle'), 3000);
-    }
+    // Since we're just applying the email (not testing), we can directly set it as verified
+    // after a short delay to provide visual feedback
+    setTimeout(() => {
+      setStatus('success');
+      onEmailVerified(true);
+      // Reset to idle after 2 seconds
+      setTimeout(() => setStatus('idle'), 2000);
+    }, 500);
   };
 
   const isValidEmail = recipientEmail && validateEmail(recipientEmail).isValid;
@@ -179,43 +163,50 @@ export function EmailSettingsSection({
             {emailVerified && !validationMessage && (
               <p id="email-verified" className="mt-1 text-sm text-green-600 flex items-center">
                 <CheckCircle className="w-3 h-3 mr-1" />
-                Email verified successfully
+                Email applied successfully
               </p>
             )}
           </div>
           
-          {/* Test Button */}
+          {/* Apply Button */}
           <button
-            onClick={handleTestEmail}
-            disabled={status === 'sending' || !recipientEmail || !!hasError}
-            className={`px-4 py-2 rounded-md font-medium transition-colors flex items-center space-x-2 min-w-[80px] ${
+            onClick={handleApplyEmail}
+            disabled={status === 'applying' || !recipientEmail || !!hasError || emailVerified}
+            className={`px-4 py-2 rounded-md font-medium transition-colors flex items-center space-x-2 min-w-[90px] ${
               status === 'success'
                 ? 'bg-green-500 text-white'
                 : status === 'error'
                 ? 'bg-red-500 text-white'
+                : emailVerified
+                ? 'bg-gray-400 text-white cursor-not-allowed'
                 : 'bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed'
             }`}
-            aria-label="Send test email"
+            aria-label="Apply email address"
           >
-            {status === 'sending' ? (
+            {status === 'applying' ? (
               <>
                 <span className="animate-spin">⏳</span>
-                <span>Sending...</span>
+                <span>Applying...</span>
               </>
             ) : status === 'success' ? (
               <>
                 <CheckCircle className="w-4 h-4" />
-                <span>Sent!</span>
+                <span>Applied!</span>
               </>
             ) : status === 'error' ? (
               <>
                 <AlertCircle className="w-4 h-4" />
                 <span>Error</span>
               </>
+            ) : emailVerified ? (
+              <>
+                <CheckCircle className="w-4 h-4" />
+                <span>Applied</span>
+              </>
             ) : (
               <>
-                <Send className="w-4 h-4" />
-                <span>Test</span>
+                <Check className="w-4 h-4" />
+                <span>Apply</span>
               </>
             )}
           </button>
