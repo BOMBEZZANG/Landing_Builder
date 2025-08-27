@@ -20,7 +20,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Section } from '@/types/builder.types';
+import { Section, DeviceType } from '@/types/builder.types';
 import { cn } from '@/lib/utils';
 import HeroSection from '@/components/sections/HeroSection';
 import ContentSection from '@/components/sections/ContentSection';
@@ -160,6 +160,7 @@ interface DraggableCanvasProps {
   onUpdateSection: (sectionId: string, updates: Partial<Section['data']>) => void;
   onReorderSections: (sections: Section[]) => void;
   isPreviewMode: boolean;
+  previewDevice?: DeviceType;
 }
 
 export default function DraggableCanvas({
@@ -168,7 +169,8 @@ export default function DraggableCanvas({
   onSelectSection,
   onUpdateSection,
   onReorderSections,
-  isPreviewMode
+  isPreviewMode,
+  previewDevice = 'desktop'
 }: DraggableCanvasProps) {
   const [activeId, setActiveId] = React.useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
@@ -219,6 +221,28 @@ export default function DraggableCanvas({
     onUpdateSection(sectionId, updates);
   };
 
+  // Helper function to get device-specific container styles
+  const getDeviceContainerStyles = (device: DeviceType) => {
+    switch (device) {
+      case 'mobile':
+        return {
+          maxWidth: '375px',
+          containerClass: 'mobile-preview'
+        };
+      case 'tablet':
+        return {
+          maxWidth: '768px',
+          containerClass: 'tablet-preview'
+        };
+      case 'desktop':
+      default:
+        return {
+          maxWidth: 'none',
+          containerClass: 'desktop-preview'
+        };
+    }
+  };
+
   const renderDragOverlay = () => {
     if (!activeId) return null;
     
@@ -241,12 +265,28 @@ export default function DraggableCanvas({
   };
 
   if (isPreviewMode) {
+    const deviceStyles = getDeviceContainerStyles(previewDevice);
+    
     // In preview mode, render without drag and drop
     return (
       <div 
-        className="w-full min-h-screen bg-white"
+        className={cn(
+          "w-full min-h-screen flex justify-center",
+          previewDevice !== 'desktop' ? 'bg-gray-100 py-8' : 'bg-white'
+        )}
       >
-        <div className="mx-auto bg-white max-w-none">
+        <div 
+          className={cn(
+            "bg-white transition-all duration-300 ease-in-out",
+            previewDevice !== 'desktop' && 'shadow-xl border border-gray-300 rounded-lg overflow-hidden',
+            deviceStyles.containerClass
+          )}
+          style={{ 
+            maxWidth: deviceStyles.maxWidth,
+            width: previewDevice === 'desktop' ? '100%' : deviceStyles.maxWidth,
+            minHeight: previewDevice === 'desktop' ? '100vh' : 'auto'
+          }}
+        >
           {sortedSections.length === 0 ? (
             <div className="flex items-center justify-center h-96 text-gray-400">
               <div className="text-center">
@@ -283,6 +323,13 @@ export default function DraggableCanvas({
             ))
           )}
         </div>
+
+        {/* Device indicator */}
+        {previewDevice !== 'desktop' && (
+          <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-white px-3 py-1 rounded-full text-sm">
+            {previewDevice === 'mobile' ? '375px' : '768px'} • {previewDevice.charAt(0).toUpperCase() + previewDevice.slice(1)} Preview
+          </div>
+        )}
       </div>
     );
   }

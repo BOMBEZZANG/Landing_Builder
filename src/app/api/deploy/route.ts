@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       includeMeta: true,
       includeAnimations: true,
       optimizeImages: true,
-      formService: 'custom' // Use custom API for form submissions
+      formService: 'custom' as const // Use custom API for form submissions
     };
 
     const options = { ...defaultOptions, ...body.options };

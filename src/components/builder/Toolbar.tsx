@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { PageState, PublishSettings } from '@/types/builder.types';
+import { PageState, PublishSettings, DeviceType } from '@/types/builder.types';
 import { validateForPublishing } from '@/utils/validation';
 import Button from '@/components/ui/Button';
 import { PublishModal } from '@/components/builder/PublishModal';
@@ -16,6 +16,8 @@ interface ToolbarProps {
   onPublish: (settings: PublishSettings) => Promise<any>;
   hasUnsavedChanges: boolean;
   isPreviewMode: boolean;
+  previewDevice: DeviceType;
+  onSetPreviewDevice: (device: DeviceType) => void;
   canUndo?: boolean;
   canRedo?: boolean;
   page: PageState;
@@ -32,6 +34,8 @@ export default function Toolbar({
   onPublish,
   hasUnsavedChanges,
   isPreviewMode,
+  previewDevice,
+  onSetPreviewDevice,
   canUndo = false,
   canRedo = false,
   page
@@ -101,15 +105,64 @@ export default function Toolbar({
         )}
       </div>
 
-      {/* Center - Page info */}
-      <div className="flex items-center space-x-2 text-sm text-gray-600">
-        <span>Untitled Page</span>
-        <span className="text-gray-400">•</span>
-        <span className={cn(
-          isPreviewMode ? 'text-green-600' : 'text-blue-600'
-        )}>
-          {isPreviewMode ? 'Preview Mode' : 'Edit Mode'}
-        </span>
+      {/* Center - Page info and Device Selector */}
+      <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 text-sm text-gray-600">
+          <span>Untitled Page</span>
+          <span className="text-gray-400">•</span>
+          <span className={cn(
+            isPreviewMode ? 'text-green-600' : 'text-blue-600'
+          )}>
+            {isPreviewMode ? 'Preview Mode' : 'Edit Mode'}
+          </span>
+        </div>
+
+        {/* Device Selector - Only show in preview mode */}
+        {isPreviewMode && (
+          <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white">
+            {[
+              { type: 'desktop' as DeviceType, icon: 'monitor', label: 'PC' },
+              { type: 'tablet' as DeviceType, icon: 'tablet', label: 'Tablet' },
+              { type: 'mobile' as DeviceType, icon: 'phone', label: 'Mobile' }
+            ].map((device, index) => (
+              <button
+                key={device.type}
+                onClick={() => onSetPreviewDevice(device.type)}
+                className={cn(
+                  'px-3 py-1.5 text-sm font-medium flex items-center space-x-2 transition-colors',
+                  previewDevice === device.type
+                    ? 'bg-blue-50 text-blue-600 border-blue-200'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50',
+                  index > 0 && 'border-l border-gray-200'
+                )}
+                title={`${device.label} Preview`}
+              >
+                {/* Monitor Icon */}
+                {device.icon === 'monitor' && (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                )}
+                
+                {/* Tablet Icon */}
+                {device.icon === 'tablet' && (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a1 1 0 001-1V4a1 1 0 00-1-1H8a1 1 0 00-1 1v16a1 1 0 001 1z" />
+                  </svg>
+                )}
+                
+                {/* Mobile Icon */}
+                {device.icon === 'phone' && (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                )}
+                
+                <span>{device.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Right side - Actions */}

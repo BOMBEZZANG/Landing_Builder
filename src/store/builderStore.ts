@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Section, PageState, BuilderState } from '@/types/builder.types';
+import { Section, PageState, BuilderState, DeviceType } from '@/types/builder.types';
 import { v4 as uuidv4 } from 'uuid';
 
 interface HistoryState {
@@ -21,6 +21,7 @@ interface BuilderStore extends BuilderState {
   reorderSections: (sections: Section[]) => void;
   selectSection: (sectionId: string | null) => void;
   togglePreview: () => void;
+  setPreviewDevice: (device: DeviceType) => void;
   updateGlobalStyles: (styles: Partial<PageState['globalStyles']>) => void;
   updateMetadata: (metadata: Partial<PageState['metadata']>) => void;
   undo: () => void;
@@ -133,6 +134,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
     page: defaultPage,
     selectedSectionId: null,
     isPreviewMode: false,
+    previewDevice: 'desktop',
     isDragging: false,
     hasUnsavedChanges: false,
     history: createInitialHistory(defaultPage),
@@ -317,6 +319,10 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
         isPreviewMode: !state.isPreviewMode,
         selectedSectionId: state.isPreviewMode ? state.selectedSectionId : null
       }));
+    },
+
+    setPreviewDevice: (device) => {
+      set({ previewDevice: device });
     },
 
     updateGlobalStyles: (styles) => {

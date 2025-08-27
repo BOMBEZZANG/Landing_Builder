@@ -18,6 +18,7 @@ export default function BuilderClient() {
     page,
     selectedSectionId,
     isPreviewMode,
+    previewDevice,
     hasUnsavedChanges,
     canUndo,
     canRedo,
@@ -27,6 +28,7 @@ export default function BuilderClient() {
     reorderSections,
     selectSection,
     togglePreview,
+    setPreviewDevice,
     updateGlobalStyles,
     undo,
     redo,
@@ -168,6 +170,8 @@ export default function BuilderClient() {
       onPublish={handlePublish}
       hasUnsavedChanges={hasUnsavedChanges}
       isPreviewMode={isPreviewMode}
+      previewDevice={previewDevice}
+      onSetPreviewDevice={setPreviewDevice}
       canUndo={canUndo}
       canRedo={canRedo}
       page={page}
@@ -203,6 +207,7 @@ export default function BuilderClient() {
       onUpdateSection={handleUpdateSection}
       onReorderSections={reorderSections}
       isPreviewMode={isPreviewMode}
+      previewDevice={previewDevice}
     />
   );
 

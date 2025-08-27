@@ -85,11 +85,15 @@ export interface PageState {
   };
 }
 
+// Device Types for Preview
+export type DeviceType = 'desktop' | 'tablet' | 'mobile';
+
 // Builder State
 export interface BuilderState {
   page: PageState;
   selectedSectionId: string | null;
   isPreviewMode: boolean;
+  previewDevice: DeviceType;
   isDragging: boolean;
   hasUnsavedChanges: boolean;
 }
