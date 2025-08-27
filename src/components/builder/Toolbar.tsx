@@ -4,6 +4,8 @@ import { PageState, PublishSettings, DeviceType } from '@/types/builder.types';
 import { validateForPublishing } from '@/utils/validation';
 import Button from '@/components/ui/Button';
 import { PublishModal } from '@/components/builder/PublishModal';
+import LanguageSwitcher from '@/components/i18n/LanguageSwitcher';
+import { useTranslation } from '@/components/i18n/I18nProvider';
 
 interface ToolbarProps {
   onSave: () => void;
@@ -40,6 +42,7 @@ export default function Toolbar({
   canRedo = false,
   page
 }: ToolbarProps) {
+  const { t } = useTranslation();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showPublishModal, setShowPublishModal] = useState(false);
 
@@ -100,7 +103,7 @@ export default function Toolbar({
         {hasUnsavedChanges && (
           <div className="flex items-center text-sm text-amber-600">
             <div className="w-2 h-2 bg-amber-400 rounded-full mr-2"></div>
-            Unsaved changes
+            {t('messages.info.unsavedChanges')}
           </div>
         )}
       </div>
@@ -113,7 +116,7 @@ export default function Toolbar({
           <span className={cn(
             isPreviewMode ? 'text-green-600' : 'text-blue-600'
           )}>
-            {isPreviewMode ? 'Preview Mode' : 'Edit Mode'}
+            {isPreviewMode ? t('builder.toolbar.previewMode') : t('builder.toolbar.editMode')}
           </span>
         </div>
 
@@ -121,9 +124,9 @@ export default function Toolbar({
         {isPreviewMode && (
           <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white">
             {[
-              { type: 'desktop' as DeviceType, icon: 'monitor', label: 'PC' },
-              { type: 'tablet' as DeviceType, icon: 'tablet', label: 'Tablet' },
-              { type: 'mobile' as DeviceType, icon: 'phone', label: 'Mobile' }
+              { type: 'desktop' as DeviceType, icon: 'monitor', label: t('builder.toolbar.pc') },
+              { type: 'tablet' as DeviceType, icon: 'tablet', label: t('builder.toolbar.tablet') },
+              { type: 'mobile' as DeviceType, icon: 'phone', label: t('builder.toolbar.mobile') }
             ].map((device, index) => (
               <button
                 key={device.type}
@@ -176,7 +179,7 @@ export default function Toolbar({
               onClick={onUndo}
               disabled={!canUndo}
               className="rounded-none border-0 px-2"
-              title="Undo (Ctrl+Z)"
+              title={`${t('builder.toolbar.undo')} (Ctrl+Z)`}
             >
               <svg
                 className="w-4 h-4"
@@ -199,7 +202,7 @@ export default function Toolbar({
               onClick={onRedo}
               disabled={!canRedo}
               className="rounded-none border-0 px-2"
-              title="Redo (Ctrl+Y)"
+              title={`${t('builder.toolbar.redo')} (Ctrl+Y)`}
             >
               <svg
                 className="w-4 h-4"
@@ -226,7 +229,7 @@ export default function Toolbar({
               size="sm"
               onClick={onShowTemplates}
               className="rounded-none border-0 px-3"
-              title="Browse Templates"
+              title={t('builder.toolbar.templates')}
             >
               <svg
                 className="w-4 h-4 mr-2"
@@ -241,7 +244,7 @@ export default function Toolbar({
                   d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                 />
               </svg>
-              Templates
+              {t('builder.toolbar.templates')}
             </Button>
             <div className="w-px h-4 bg-gray-200" />
             <Button
@@ -249,7 +252,7 @@ export default function Toolbar({
               size="sm"
               onClick={onSaveTemplate}
               className="rounded-none border-0 px-3"
-              title="Save as Template"
+              title={t('modals.saveTemplate.title')}
             >
               <svg
                 className="w-4 h-4 mr-2"
@@ -264,7 +267,7 @@ export default function Toolbar({
                   d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
                 />
               </svg>
-              Save
+              {t('builder.toolbar.saveTemplate')}
             </Button>
           </div>
         )}
@@ -289,7 +292,7 @@ export default function Toolbar({
               d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
             />
           </svg>
-          {hasUnsavedChanges ? 'Save Draft' : 'Saved'}
+          {hasUnsavedChanges ? t('builder.toolbar.save') : t('builder.toolbar.saved')}
         </Button>
 
         {/* Preview/Edit Toggle */}
@@ -313,7 +316,7 @@ export default function Toolbar({
                   d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                 />
               </svg>
-              Edit
+              {t('common.edit')}
             </>
           ) : (
             <>
@@ -336,7 +339,7 @@ export default function Toolbar({
                   d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                 />
               </svg>
-              Preview
+              {t('common.preview')}
             </>
           )}
         </Button>
@@ -365,7 +368,7 @@ export default function Toolbar({
                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z"
                 />
               </svg>
-              Confirm Reset
+              {t('builder.toolbar.confirmReset')}
             </>
           ) : (
             <>
@@ -382,11 +385,14 @@ export default function Toolbar({
                   d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                 />
               </svg>
-              Reset
+              {t('builder.toolbar.reset')}
             </>
           )}
         </Button>
 
+        {/* Language Switcher */}
+        <LanguageSwitcher />
+        
         {/* Publish Button */}
         <Button
           variant={canPublish ? "primary" : "outline"}
@@ -395,7 +401,7 @@ export default function Toolbar({
           className={cn(
             !canPublish && "border-red-300 text-red-600 hover:border-red-400 hover:text-red-700"
           )}
-          title={canPublish ? "Publish your landing page" : "Fix validation errors to publish"}
+          title={canPublish ? t('modals.publishSettings.publishYourLandingPage') : t('modals.publishSettings.fixValidationErrors')}
         >
           <svg
             className="w-4 h-4 mr-2"
@@ -410,7 +416,7 @@ export default function Toolbar({
               d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
             />
           </svg>
-          Publish
+          {t('common.publish')}
         </Button>
       </div>
 

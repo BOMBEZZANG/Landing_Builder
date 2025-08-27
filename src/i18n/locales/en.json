@@ -1,0 +1,240 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "preview": "Preview",
+    "publish": "Publish",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "reset": "Reset",
+    "templates": "Templates",
+    "applied": "Applied",
+    "apply": "Apply"
+  },
+  "builder": {
+    "toolbar": {
+      "save": "Save Draft",
+      "saved": "Saved",
+      "preview": "Preview",
+      "publish": "Publish",
+      "settings": "Settings",
+      "undo": "Undo",
+      "redo": "Redo",
+      "reset": "Reset",
+      "confirmReset": "Confirm Reset",
+      "templates": "Templates",
+      "saveTemplate": "Save",
+      "editMode": "Edit Mode",
+      "previewMode": "Preview Mode",
+      "pc": "PC",
+      "tablet": "Tablet",
+      "mobile": "Mobile"
+    },
+    "sections": {
+      "hero": "Hero Section",
+      "content": "Content Section",
+      "cta": "Call to Action",
+      "addSection": "Add Section",
+      "moveUp": "Move Up",
+      "moveDown": "Move Down",
+      "duplicate": "Duplicate",
+      "remove": "Remove",
+      "noSections": "No sections yet",
+      "sectionsWillAppear": "Sections will appear here"
+    },
+    "properties": {
+      "background": "Background",
+      "backgroundColor": "Background Color",
+      "backgroundImage": "Background Image",
+      "backgroundType": "Background Type",
+      "backgroundGradient": "Background Gradient",
+      "text": "Text",
+      "textColor": "Text Color",
+      "fontSize": "Font Size",
+      "fontFamily": "Font Family",
+      "alignment": "Alignment",
+      "padding": "Padding",
+      "margin": "Margin",
+      "layout": "Layout",
+      "colors": "Colors",
+      "spacing": "Spacing",
+      "headline": "Headline",
+      "subheadline": "Subheadline",
+      "buttonText": "Button Text",
+      "buttonAction": "Button Action",
+      "buttonColor": "Button Color",
+      "title": "Title",
+      "content": "Content",
+      "imagePosition": "Image Position",
+      "description": "Description",
+      "formEnabled": "Form Enabled",
+      "formFields": "Form Fields",
+      "left": "Left",
+      "center": "Center",
+      "right": "Right",
+      "top": "Top",
+      "bottom": "Bottom",
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large",
+      "color": "Color",
+      "image": "Image",
+      "gradient": "Gradient",
+      "scroll": "Scroll",
+      "form": "Form",
+      "link": "Link",
+      "modern": "Modern",
+      "classic": "Classic",
+      "playful": "Playful"
+    }
+  },
+  "form": {
+    "labels": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "message": "Message",
+      "subject": "Subject",
+      "recipientEmail": "Recipient Email",
+      "yourBusinessEmail": "Your Business Email"
+    },
+    "placeholders": {
+      "name": "Enter your name",
+      "email": "Enter your email address",
+      "phone": "Enter your phone number",
+      "message": "Enter your message",
+      "subject": "Enter subject",
+      "enterText": "Enter text here...",
+      "yourEmailCompany": "your-email@company.com",
+      "enterYourName": "Your Name",
+      "enterYourEmail": "Your Email",
+      "enterYourPhone": "Your Phone"
+    },
+    "buttons": {
+      "submit": "Submit",
+      "reset": "Reset",
+      "clear": "Clear",
+      "getStarted": "Get Started",
+      "getStartedNow": "Get Started Now"
+    },
+    "validation": {
+      "required": "This field is required",
+      "invalidEmail": "Please enter a valid email address",
+      "invalidPhone": "Please enter a valid phone number",
+      "minLength": "Minimum {min} characters required",
+      "maxLength": "Maximum {max} characters allowed"
+    }
+  },
+  "messages": {
+    "success": {
+      "saved": "Page saved successfully!",
+      "published": "Page published successfully!",
+      "emailSent": "Email sent successfully!",
+      "emailApplied": "Email applied successfully",
+      "imageUploaded": "Image uploaded successfully!",
+      "settingsUpdated": "Settings updated successfully!",
+      "templateSaved": "Template saved successfully!"
+    },
+    "error": {
+      "saveFailed": "Failed to save page",
+      "publishFailed": "Failed to publish page",
+      "uploadFailed": "Failed to upload image",
+      "networkError": "Network error occurred",
+      "invalidInput": "Invalid input provided",
+      "genericError": "An error occurred",
+      "emailServiceNotConfigured": "Email service not configured. Please contact administrator."
+    },
+    "info": {
+      "autoSave": "Auto-saved",
+      "unsavedChanges": "Unsaved changes",
+      "processing": "Processing...",
+      "loadingBuilder": "Loading builder...",
+      "initializingCanvas": "Initializing canvas...",
+      "applicationReceiverSettings": "Application Receiver Settings",
+      "receiveCustomerApplications": "You'll receive customer applications at this email",
+      "notVisibleToCustomers": "This email is NOT visible to your customers",
+      "important": "Important"
+    }
+  },
+  "modals": {
+    "confirmDelete": {
+      "title": "Confirm Delete",
+      "message": "Are you sure you want to delete this item?",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    },
+    "publishSettings": {
+      "title": "Publish Settings",
+      "domain": "Domain",
+      "customDomain": "Custom Domain",
+      "seo": "SEO Settings",
+      "analytics": "Analytics",
+      "enableAnalytics": "Enable Analytics",
+      "formService": "Form Service",
+      "optimizations": "Optimizations",
+      "minify": "Minify HTML",
+      "optimizeImages": "Optimize Images",
+      "includeAnimations": "Include Animations",
+      "publishYourLandingPage": "Publish your landing page",
+      "fixValidationErrors": "Fix validation errors to publish",
+      "publishing": "Publishing...",
+      "publishedSuccessfully": "Published Successfully!",
+      "liveUrl": "Live URL",
+      "openInNewTab": "Open in New Tab",
+      "copyLink": "Copy Link",
+      "linkCopied": "Link Copied!",
+      "close": "Close"
+    },
+    "imageUpload": {
+      "title": "Upload Image",
+      "dragDrop": "Drag and drop an image here",
+      "browse": "or click to browse",
+      "maxSize": "Maximum file size: 5MB",
+      "supportedFormats": "Supported formats: JPG, PNG, WebP",
+      "uploading": "Uploading...",
+      "processing": "Processing...",
+      "dropImage": "Drop image here"
+    },
+    "saveTemplate": {
+      "title": "Save as Template",
+      "templateName": "Template Name",
+      "enterTemplateName": "Enter template name",
+      "category": "Category",
+      "tags": "Tags",
+      "enterTags": "Enter tags (comma separated)",
+      "saving": "Saving..."
+    }
+  },
+  "email": {
+    "settings": {
+      "applicationReceiverSettings": "📮 Application Receiver Settings",
+      "receiveApplicationsAt": "You'll receive customer applications at this email",
+      "yourBusinessEmail": "Your Business Email",
+      "apply": "Apply",
+      "applying": "Applying...",
+      "applied": "Applied",
+      "emailAppliedSuccessfully": "Email applied successfully",
+      "howItWorks": "How it works:",
+      "visitor": "Visitor",
+      "form": "Form",
+      "you": "You"
+    }
+  },
+  "canvas": {
+    "dragToReorder": "Canvas • Drag sections to reorder • Click to edit",
+    "clickToEdit": "Click to edit",
+    "loadingBuilder": "Loading builder...",
+    "noSectionsYet": "No sections yet",
+    "addSectionsUsing": "Add sections using the toolbar above"
+  },
+  "landing": {
+    "defaultHeadline": "Welcome to Your Landing Page",
+    "defaultSubheadline": "Create beautiful pages in minutes with our drag-and-drop builder",
+    "defaultContent": "Build responsive, professional landing pages without any coding knowledge. Our intuitive builder makes it easy to create stunning pages that convert.",
+    "defaultCta": "Ready to Get Started?",
+    "defaultCtaDescription": "Join thousands of satisfied customers who have built amazing landing pages"
+  }
+}

@@ -1,0 +1,240 @@
+{
+  "common": {
+    "save": "저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "edit": "편집",
+    "preview": "미리보기",
+    "publish": "배포",
+    "loading": "로딩 중...",
+    "error": "오류",
+    "success": "성공",
+    "reset": "초기화",
+    "templates": "템플릿",
+    "applied": "적용됨",
+    "apply": "적용"
+  },
+  "builder": {
+    "toolbar": {
+      "save": "임시저장",
+      "saved": "저장됨",
+      "preview": "미리보기",
+      "publish": "배포",
+      "settings": "설정",
+      "undo": "실행취소",
+      "redo": "다시실행",
+      "reset": "초기화",
+      "confirmReset": "초기화 확인",
+      "templates": "템플릿",
+      "saveTemplate": "저장",
+      "editMode": "편집 모드",
+      "previewMode": "미리보기 모드",
+      "pc": "PC",
+      "tablet": "태블릿",
+      "mobile": "모바일"
+    },
+    "sections": {
+      "hero": "메인 섹션",
+      "content": "콘텐츠 섹션",
+      "cta": "액션 섹션",
+      "addSection": "섹션 추가",
+      "moveUp": "위로 이동",
+      "moveDown": "아래로 이동",
+      "duplicate": "복제",
+      "remove": "제거",
+      "noSections": "섹션이 없습니다",
+      "sectionsWillAppear": "섹션이 여기에 표시됩니다"
+    },
+    "properties": {
+      "background": "배경",
+      "backgroundColor": "배경색",
+      "backgroundImage": "배경 이미지",
+      "backgroundType": "배경 타입",
+      "backgroundGradient": "배경 그라데이션",
+      "text": "텍스트",
+      "textColor": "텍스트 색상",
+      "fontSize": "글자 크기",
+      "fontFamily": "글꼴",
+      "alignment": "정렬",
+      "padding": "안쪽 여백",
+      "margin": "바깥쪽 여백",
+      "layout": "레이아웃",
+      "colors": "색상",
+      "spacing": "간격",
+      "headline": "헤드라인",
+      "subheadline": "서브 헤드라인",
+      "buttonText": "버튼 텍스트",
+      "buttonAction": "버튼 액션",
+      "buttonColor": "버튼 색상",
+      "title": "제목",
+      "content": "내용",
+      "imagePosition": "이미지 위치",
+      "description": "설명",
+      "formEnabled": "폼 활성화",
+      "formFields": "폼 필드",
+      "left": "왼쪽",
+      "center": "가운데",
+      "right": "오른쪽",
+      "top": "위",
+      "bottom": "아래",
+      "small": "작게",
+      "medium": "보통",
+      "large": "크게",
+      "color": "색상",
+      "image": "이미지",
+      "gradient": "그라데이션",
+      "scroll": "스크롤",
+      "form": "폼",
+      "link": "링크",
+      "modern": "모던",
+      "classic": "클래식",
+      "playful": "플레이풀"
+    }
+  },
+  "form": {
+    "labels": {
+      "name": "이름",
+      "email": "이메일",
+      "phone": "전화번호",
+      "message": "메시지",
+      "subject": "제목",
+      "recipientEmail": "수신 이메일",
+      "yourBusinessEmail": "비즈니스 이메일"
+    },
+    "placeholders": {
+      "name": "이름을 입력하세요",
+      "email": "이메일 주소를 입력하세요",
+      "phone": "전화번호를 입력하세요",
+      "message": "메시지를 입력하세요",
+      "subject": "제목을 입력하세요",
+      "enterText": "텍스트를 입력하세요...",
+      "yourEmailCompany": "your-email@company.com",
+      "enterYourName": "이름",
+      "enterYourEmail": "이메일",
+      "enterYourPhone": "전화번호"
+    },
+    "buttons": {
+      "submit": "제출하기",
+      "reset": "초기화",
+      "clear": "지우기",
+      "getStarted": "시작하기",
+      "getStartedNow": "지금 시작하기"
+    },
+    "validation": {
+      "required": "필수 입력 항목입니다",
+      "invalidEmail": "올바른 이메일 주소를 입력하세요",
+      "invalidPhone": "올바른 전화번호를 입력하세요",
+      "minLength": "최소 {min}자 이상 입력하세요",
+      "maxLength": "최대 {max}자까지 입력 가능합니다"
+    }
+  },
+  "messages": {
+    "success": {
+      "saved": "페이지가 성공적으로 저장되었습니다!",
+      "published": "페이지가 성공적으로 배포되었습니다!",
+      "emailSent": "이메일이 성공적으로 발송되었습니다!",
+      "emailApplied": "이메일이 성공적으로 적용되었습니다",
+      "imageUploaded": "이미지가 성공적으로 업로드되었습니다!",
+      "settingsUpdated": "설정이 성공적으로 업데이트되었습니다!",
+      "templateSaved": "템플릿이 성공적으로 저장되었습니다!"
+    },
+    "error": {
+      "saveFailed": "페이지 저장에 실패했습니다",
+      "publishFailed": "페이지 배포에 실패했습니다",
+      "uploadFailed": "이미지 업로드에 실패했습니다",
+      "networkError": "네트워크 오류가 발생했습니다",
+      "invalidInput": "잘못된 입력입니다",
+      "genericError": "오류가 발생했습니다",
+      "emailServiceNotConfigured": "이메일 서비스가 구성되지 않았습니다. 관리자에게 문의하세요."
+    },
+    "info": {
+      "autoSave": "자동 저장됨",
+      "unsavedChanges": "저장되지 않은 변경사항",
+      "processing": "처리 중...",
+      "loadingBuilder": "빌더 로딩 중...",
+      "initializingCanvas": "캔버스 초기화 중...",
+      "applicationReceiverSettings": "신청 수신 설정",
+      "receiveCustomerApplications": "이 이메일로 고객 신청서를 받습니다",
+      "notVisibleToCustomers": "이 이메일은 고객에게 표시되지 않습니다",
+      "important": "중요"
+    }
+  },
+  "modals": {
+    "confirmDelete": {
+      "title": "삭제 확인",
+      "message": "정말로 이 항목을 삭제하시겠습니까?",
+      "confirm": "삭제",
+      "cancel": "취소"
+    },
+    "publishSettings": {
+      "title": "배포 설정",
+      "domain": "도메인",
+      "customDomain": "커스텀 도메인",
+      "seo": "SEO 설정",
+      "analytics": "분석 도구",
+      "enableAnalytics": "분석 도구 활성화",
+      "formService": "폼 서비스",
+      "optimizations": "최적화",
+      "minify": "HTML 압축",
+      "optimizeImages": "이미지 최적화",
+      "includeAnimations": "애니메이션 포함",
+      "publishYourLandingPage": "랜딩 페이지 배포하기",
+      "fixValidationErrors": "배포하려면 유효성 오류를 수정하세요",
+      "publishing": "배포 중...",
+      "publishedSuccessfully": "배포 성공!",
+      "liveUrl": "라이브 URL",
+      "openInNewTab": "새 탭에서 열기",
+      "copyLink": "링크 복사",
+      "linkCopied": "링크 복사됨!",
+      "close": "닫기"
+    },
+    "imageUpload": {
+      "title": "이미지 업로드",
+      "dragDrop": "이미지를 여기에 드래그하세요",
+      "browse": "또는 클릭하여 찾아보기",
+      "maxSize": "최대 파일 크기: 5MB",
+      "supportedFormats": "지원 형식: JPG, PNG, WebP",
+      "uploading": "업로드 중...",
+      "processing": "처리 중...",
+      "dropImage": "여기에 이미지를 놓으세요"
+    },
+    "saveTemplate": {
+      "title": "템플릿으로 저장",
+      "templateName": "템플릿 이름",
+      "enterTemplateName": "템플릿 이름을 입력하세요",
+      "category": "카테고리",
+      "tags": "태그",
+      "enterTags": "태그 입력 (쉼표로 구분)",
+      "saving": "저장 중..."
+    }
+  },
+  "email": {
+    "settings": {
+      "applicationReceiverSettings": "📮 신청 수신 설정",
+      "receiveApplicationsAt": "이 이메일로 고객 신청서를 받습니다",
+      "yourBusinessEmail": "비즈니스 이메일",
+      "apply": "적용",
+      "applying": "적용 중...",
+      "applied": "적용됨",
+      "emailAppliedSuccessfully": "이메일이 성공적으로 적용되었습니다",
+      "howItWorks": "작동 방식:",
+      "visitor": "방문자",
+      "form": "폼",
+      "you": "나"
+    }
+  },
+  "canvas": {
+    "dragToReorder": "캔버스 • 드래그하여 순서 변경 • 클릭하여 편집",
+    "clickToEdit": "클릭하여 편집",
+    "loadingBuilder": "빌더 로딩 중...",
+    "noSectionsYet": "아직 섹션이 없습니다",
+    "addSectionsUsing": "위의 도구 모음을 사용하여 섹션을 추가하세요"
+  },
+  "landing": {
+    "defaultHeadline": "랜딩 페이지에 오신 것을 환영합니다",
+    "defaultSubheadline": "드래그 앤 드롭 빌더로 몇 분 만에 아름다운 페이지를 만드세요",
+    "defaultContent": "코딩 지식 없이도 반응형 전문 랜딩 페이지를 구축하세요. 직관적인 빌더로 전환율이 높은 멋진 페이지를 쉽게 만들 수 있습니다.",
+    "defaultCta": "시작할 준비가 되셨나요?",
+    "defaultCtaDescription": "놀라운 랜딩 페이지를 구축한 수천 명의 만족스러운 고객과 함께하세요"
+  }
+}
