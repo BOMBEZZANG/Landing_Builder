@@ -35,6 +35,8 @@ export function generateCTAHTML(section: CTASection): string {
   // Generate form or button
   const actionHTML = data.formEnabled ? `
     <form id="contact-form" class="form-container" 
+          method="POST"
+          action="#"
           data-form-handler="true"
           data-page-id="landing-page-${Date.now()}"
           data-recipient-email="${escapeHTML(data.recipientEmail)}"

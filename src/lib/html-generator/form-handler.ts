@@ -189,6 +189,7 @@ function generateCustomHandler(ctaSection: CTASection): string {
       
       form.addEventListener('submit', async function(e) {
         e.preventDefault();
+        console.log('Form submission started');
         
         const submitButton = form.querySelector('button[type="submit"]');
         const originalButtonText = submitButton ? submitButton.textContent : 'Submit';
@@ -226,6 +227,9 @@ function generateCustomHandler(ctaSection: CTASection): string {
         try {
           // Use absolute URL for the API endpoint to ensure it works on deployed static sites
           const apiEndpoint = '${apiUrl}/api/submit-form';
+          console.log('Sending form data to:', apiEndpoint);
+          console.log('Form data:', submissionData);
+          
           const response = await fetch(apiEndpoint, {
             method: 'POST',
             headers: {
