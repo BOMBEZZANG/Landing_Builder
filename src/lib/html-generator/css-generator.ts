@@ -212,6 +212,7 @@ export function generateCSS(pageState: PageState, options: GeneratorOptions = {}
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.5);
+      -webkit-backdrop-filter: blur(4px);
       backdrop-filter: blur(4px);
     }
     

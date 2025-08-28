@@ -148,6 +148,8 @@ function generateNetlifyHandler(ctaSection: CTASection): string {
       honeypot.style.display = 'none';
       honeypot.setAttribute('tabindex', '-1');
       honeypot.setAttribute('autocomplete', 'off');
+      honeypot.setAttribute('aria-hidden', 'true');
+      honeypot.setAttribute('title', 'Leave this field blank - it is for spam protection');
       form.appendChild(honeypot);
       
       form.addEventListener('submit', function(e) {
@@ -232,12 +234,17 @@ function generateCustomHandler(ctaSection: CTASection): string {
       
       console.log('Form handler initialized');
       
+      // Ensure form doesn't have action or method that could cause redirect
+      form.removeAttribute('action');
+      form.removeAttribute('method');
+      
       const message = document.getElementById('form-message');
       const recipientEmail = '${ctaSection.data.recipientEmail}';
       
       form.addEventListener('submit', async function(e) {
         e.preventDefault();
-        console.log('Form submission started');
+        e.stopPropagation();
+        console.log('Form submission started - preventing default action');
         
         const submitButton = form.querySelector('button[type="submit"]');
         const originalButtonText = submitButton ? submitButton.textContent : 'Submit';

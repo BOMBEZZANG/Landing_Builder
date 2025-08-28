@@ -20,7 +20,7 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
   const [publishSettings, setPublishSettings] = useState<PublishSettings>({
     userId: 'user-' + Date.now(),
     enableAnalytics: true,
-    formService: 'netlify-forms', // Default to Netlify Forms
+    formService: 'custom', // Use custom API for better control
     optimizations: {
       minify: true,
       optimizeImages: true,
@@ -53,7 +53,7 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
     // Use default settings with Netlify Forms and all optimizations
     const defaultSettings = {
       ...publishSettings,
-      formService: 'netlify-forms' as const,
+      formService: 'custom' as const,
       optimizations: {
         minify: true,
         optimizeImages: true,
