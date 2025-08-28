@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- Content Security Policy - Allow inline scripts and external API calls -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; connect-src 'self' https://easy-landing-omega.vercel.app https://api.resend.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
+    
+    <title>Complete Form Fix Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .cta-section {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .form-container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .form-field {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .form-field:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        .form-field.error {
+            border-color: #dc2626;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .form-message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 4px;
+            display: none;
+            text-align: center;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="cta-section">
+        <h1>Complete Form Fix Test</h1>
+        <p>This form includes all fixes: CSP headers, autocomplete, DOM ready, and proper form attributes.</p>
+        
+        <!-- Fixed form with all improvements -->
+        <form id="contact-form" class="form-container" 
+              method="POST"
+              action="#"
+              data-form-handler="true"
+              data-page-id="test-complete-fix-12345"
+              data-recipient-email="bombezzang100@gmail.com"
+              data-endpoint="/api/submit-form">
+          
+          <div class="form-group">
+            <input type="text" name="name" placeholder="Your Name" class="form-field" autocomplete="name" required>
+          </div>
+          
+          <div class="form-group">
+            <input type="email" name="email" placeholder="Your Email" class="form-field" autocomplete="email" required>
+          </div>
+          
+          <div class="form-group">
+            <input type="tel" name="phone" placeholder="Your Phone" class="form-field" autocomplete="tel" required>
+          </div>
+          
+          <button type="submit" class="btn cta-button">Send Message</button>
+          <div id="form-message" class="form-message" style="display: none;"></div>
+        </form>
+    </div>
+    
+    <script>
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('contact-form');
+      if (!form) {
+        console.error('Contact form not found');
+        return;
+      }
+      
+      console.log('Form handler initialized');
+      
+      const message = document.getElementById('form-message');
+      const recipientEmail = 'bombezzang100@gmail.com';
+      
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        console.log('Form submission started');
+        
+        const submitButton = form.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton ? submitButton.textContent : 'Submit';
+        
+        // Disable form and show loading state
+        if (submitButton) {
+          submitButton.disabled = true;
+          submitButton.innerHTML = '<span class="spinner"></span> Sending...';
+        }
+        
+        // Hide any existing messages
+        if (message) {
+          message.style.display = 'none';
+        }
+        
+        // Collect form data
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => {
+          data[key] = value;
+        });
+        
+        // Add metadata
+        const submissionData = {
+          formData: data,
+          recipientEmail: recipientEmail,
+          pageUrl: window.location.href,
+          pageTitle: document.title,
+          timestamp: new Date().toISOString(),
+          userAgent: navigator.userAgent,
+          referrer: document.referrer || 'Direct',
+          pageId: form.getAttribute('data-page-id') || 'unknown'
+        };
+        
+        try {
+          // Use absolute URL for the API endpoint to ensure it works on deployed static sites
+          const apiEndpoint = 'https://easy-landing-omega.vercel.app/api/submit-form';
+          console.log('Sending form data to:', apiEndpoint);
+          console.log('Form data:', submissionData);
+          
+          const response = await fetch(apiEndpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            mode: 'cors',
+            body: JSON.stringify(submissionData)
+          });
+          
+          const result = await response.json();
+          console.log('Response:', result);
+          
+          if (response.ok && result.success) {
+            // Success
+            if (message) {
+              message.className = 'form-message success';
+              message.textContent = result.message || 'Thank you! Your message has been sent successfully. Check your email!';
+              message.style.display = 'block';
+            }
+            form.reset();
+            console.log('✅ Form submitted successfully! Check email at: ' + recipientEmail);
+          } else {
+            throw new Error(result.error || 'Submission failed');
+          }
+        } catch (error) {
+          // Error handling
+          console.error('Form submission error:', error);
+          if (message) {
+            message.className = 'form-message error';
+            message.textContent = 'Sorry, there was an error sending your message. Please try again or contact us directly.';
+            message.style.display = 'block';
+          }
+        } finally {
+          // Re-enable form
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = originalButtonText;
+          }
+        }
+      });
+      
+      // Real-time form validation
+      const inputs = form.querySelectorAll('input[required]');
+      inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+          validateField(this);
+        });
+        
+        input.addEventListener('input', function() {
+          if (this.classList.contains('error')) {
+            validateField(this);
+          }
+        });
+      });
+      
+      function validateField(field) {
+        const isValid = field.checkValidity();
+        
+        if (isValid) {
+          field.classList.remove('error');
+          field.style.borderColor = '#ddd';
+        } else {
+          field.classList.add('error');
+          field.style.borderColor = '#dc2626';
+        }
+      }
+      
+      // Clear message when user starts typing
+      form.addEventListener('input', function() {
+        if (message && message.style.display !== 'none') {
+          message.style.display = 'none';
+        }
+      });
+      
+    }); // End DOMContentLoaded event listener
+    </script>
+</body>
+</html>

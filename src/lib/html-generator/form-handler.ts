@@ -180,9 +180,15 @@ function generateCustomHandler(ctaSection: CTASection): string {
   // The generated HTML will use this URL to submit forms
   const apiUrl = 'https://easy-landing-omega.vercel.app';
   return `
-    (function() {
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
       const form = document.getElementById('contact-form');
-      if (!form) return;
+      if (!form) {
+        console.error('Contact form not found');
+        return;
+      }
+      
+      console.log('Form handler initialized');
       
       const message = document.getElementById('form-message');
       const recipientEmail = '${ctaSection.data.recipientEmail}';
@@ -321,7 +327,7 @@ function generateCustomHandler(ctaSection: CTASection): string {
           message.style.display = 'none';
         }
       });
-    })();
+    }); // End DOMContentLoaded event listener
   `.trim();
 }
 

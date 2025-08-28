@@ -10,7 +10,7 @@ export function generateCTAHTML(section: CTASection): string {
     if (data.formFields.name) {
       formFields.push(`
         <div class="form-group">
-          <input type="text" name="name" placeholder="Your Name" class="form-field" required>
+          <input type="text" name="name" placeholder="Your Name" class="form-field" autocomplete="name" required>
         </div>
       `);
     }
@@ -18,7 +18,7 @@ export function generateCTAHTML(section: CTASection): string {
     if (data.formFields.email) {
       formFields.push(`
         <div class="form-group">
-          <input type="email" name="email" placeholder="Your Email" class="form-field" required>
+          <input type="email" name="email" placeholder="Your Email" class="form-field" autocomplete="email" required>
         </div>
       `);
     }
@@ -26,7 +26,7 @@ export function generateCTAHTML(section: CTASection): string {
     if (data.formFields.phone) {
       formFields.push(`
         <div class="form-group">
-          <input type="tel" name="phone" placeholder="Your Phone" class="form-field" required>
+          <input type="tel" name="phone" placeholder="Your Phone" class="form-field" autocomplete="tel" required>
         </div>
       `);
     }
