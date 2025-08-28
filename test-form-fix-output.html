@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- Content Security Policy - Allow inline scripts, eval for deployment platforms, and external API calls -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://vercel.live; connect-src 'self' https://easy-landing-omega.vercel.app https://api.resend.com https://vercel.live wss://vercel.live https://vitals.vercel-insights.com; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
+    
+    <!-- SEO Meta Tags -->
+    <title>Form Fix Test</title>
+    <meta name="description" content="Test form endpoint fix">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Form Fix Test">
+    <meta property="og:description" content="Test form endpoint fix">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Form Fix Test">
+    <meta name="twitter:description" content="Test form endpoint fix">
+    
+    <!-- Favicon -->
+    
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://res.cloudinary.com">
+    
+    <style>
+/* Reset and Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      overflow-x: hidden;
+    }
+    
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+    
+    /* CSS Variables */
+    :root {
+      --primary-color: #3b82f6;
+      --secondary-color: #10b981;
+      --text-dark: #1f2937;
+      --text-light: #6b7280;
+      --bg-light: #f9fafb;
+      --border-color: #e5e7eb;
+    }
+    
+    /* Hero Section Styles */
+    .hero-section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      position: relative;
+    }
+    
+    .hero-title {
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 700;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+    
+    .hero-subtitle {
+      font-size: clamp(1rem, 2.5vw, 1.5rem);
+      margin-bottom: 2rem;
+      opacity: 0.9;
+    }
+    
+    /* Content Section Styles */
+    .content-section {
+      padding: 80px 20px;
+    }
+    
+    .content-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+    
+    .content-stacked {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+    
+    .content-title {
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      margin-bottom: 1rem;
+      color: inherit;
+    }
+    
+    .content-body {
+      font-size: 1.1rem;
+      line-height: 1.8;
+    }
+    
+    .content-body p {
+      margin-bottom: 1rem;
+    }
+    
+    .content-image img {
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      width: 100%;
+      height: auto;
+    }
+    
+    /* CTA Section Styles */
+    .cta-section {
+      padding: 80px 20px;
+      text-align: center;
+    }
+    
+    .cta-container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .cta-title {
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      margin-bottom: 1rem;
+    }
+    
+    .cta-description {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+    }
+    
+    /* Form Styles */
+    .form-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-field {
+      width: 100%;
+      padding: 14px 20px;
+      font-size: 16px;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      background: white;
+    }
+    
+    .form-field:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .form-field::placeholder {
+      color: var(--text-light);
+    }
+    
+    .form-message {
+      margin-top: 1rem;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+    
+    .form-message.success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .form-message.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    /* Button Styles */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 32px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: white;
+      text-decoration: none;
+      min-height: 48px;
+      font-family: inherit;
+    }
+    
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+    
+    /* Loading Spinner */
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Responsive Design */
+    @media (min-width: 768px) {
+      .hero-section {
+        padding: 60px 40px;
+      }
+      
+      .content-section,
+      .cta-section {
+        padding: 100px 40px;
+      }
+      
+      .content-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 60px;
+      }
+      
+      .form-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        align-items: start;
+      }
+      
+      .form-container button {
+        grid-column: 1 / -1;
+      }
+      
+      .form-message {
+        grid-column: 1 / -1;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .hero-section {
+        min-height: 80vh;
+        padding: 30px 15px;
+      }
+      
+      .content-section,
+      .cta-section {
+        padding: 60px 15px;
+      }
+      
+      .btn {
+        width: 100%;
+        padding: 16px 24px;
+      }
+      
+      .form-field {
+        font-size: 16px; /* Prevents zoom on iOS */
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .hero-section {
+        min-height: 70vh;
+      }
+      
+      .content-section,
+      .cta-section {
+        padding: 40px 15px;
+      }
+    }
+    
+    /* Utility Classes */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    
+    .relative {
+      position: relative;
+    }
+    
+    .absolute {
+      position: absolute;
+    }
+    
+    .inset-0 {
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    }
+    
+    .z-10 {
+      z-index: 10;
+    }
+    
+    .flex {
+      display: flex;
+    }
+    
+    .items-center {
+      align-items: center;
+    }
+    
+    .justify-center {
+      justify-content: center;
+    }
+    
+    .text-left {
+      text-align: left;
+    }
+    
+    .text-center {
+      text-align: center;
+    }
+    
+    .text-right {
+      text-align: right;
+    }
+    
+    .font-bold {
+      font-weight: 700;
+    }
+    
+    .font-light {
+      font-weight: 300;
+    }
+    
+    .bg-black {
+      background-color: black;
+    }
+    
+    .bg-opacity-30 {
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+      }
+      
+      html {
+        scroll-behavior: auto;
+      }
+    }
+    
+    /* Focus styles for accessibility */
+    .btn:focus-visible,
+    .form-field:focus-visible {
+      outline: 2px solid #2563eb;
+      outline-offset: 2px;
+    }
+    
+    /* Print Styles */
+    @media print {
+      .hero-section {
+        min-height: auto;
+        page-break-inside: avoid;
+      }
+      
+      .btn,
+      .form-container {
+        display: none !important;
+      }
+      
+      * {
+        color: black !important;
+        background: white !important;
+        box-shadow: none !important;
+      }
+      
+      h1, h2, h3 {
+        color: black !important;
+      }
+    }
+  
+    /* Animation Styles */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .animate-fade-in {
+      animation: fadeIn 0.8s ease-out;
+    }
+    
+    .animate-slide-in-left {
+      animation: slideInLeft 0.8s ease-out;
+    }
+    
+    .animate-slide-in-right {
+      animation: slideInRight 0.8s ease-out;
+    }
+</style>
+</head>
+<body>
+    <section id="cta-0" class="cta-section text-center" style="background-color: #ffffff;">
+      <div class="cta-container">
+        <h2 class="cta-title font-bold" style="color: #1f2937;">
+          Contact Us
+        </h2>
+        <p class="cta-description font-light" style="color: #1f2937;">
+          Test form with API endpoint fix
+        </p>
+        
+    <form id="contact-form" class="form-container" 
+          method="POST"
+          action="https://easy-landing-omega.vercel.app/api/submit-form"
+          data-form-handler="true"
+          data-page-id="landing-page-1756363839685"
+          data-recipient-email="test@example.com"
+          data-endpoint="https://easy-landing-omega.vercel.app/api/submit-form">
+      <!-- Hidden fields for form metadata -->
+      <input type="hidden" name="recipientEmail" value="test@example.com">
+      <input type="hidden" name="pageId" value="landing-page-1756363839685">
+      
+        <div class="form-group">
+          <input type="text" name="name" placeholder="Your Name" class="form-field" autocomplete="name" required>
+        </div>
+      
+        <div class="form-group">
+          <input type="email" name="email" placeholder="Your Email" class="form-field" autocomplete="email" required>
+        </div>
+      
+        <div class="form-group">
+          <input type="tel" name="phone" placeholder="Your Phone" class="form-field" autocomplete="tel" required>
+        </div>
+      
+      <button type="submit" class="btn cta-button" style="background-color: #3b82f6; color: white;">
+        Send Message
+      </button>
+      <div id="form-message" class="form-message" style="display: none;"></div>
+    </form>
+  
+      </div>
+    </section>
+    <script>
+// Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('contact-form');
+      if (!form) {
+        console.error('Contact form not found');
+        return;
+      }
+      
+      console.log('Form handler initialized');
+      
+      const message = document.getElementById('form-message');
+      const recipientEmail = 'test@example.com';
+      
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        console.log('Form submission started');
+        
+        const submitButton = form.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton ? submitButton.textContent : 'Submit';
+        
+        // Disable form and show loading state
+        if (submitButton) {
+          submitButton.disabled = true;
+          submitButton.innerHTML = '<span class="spinner"></span> Sending...';
+        }
+        
+        // Hide any existing messages
+        if (message) {
+          message.style.display = 'none';
+        }
+        
+        // Collect form data
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => {
+          data[key] = value;
+        });
+        
+        // Add metadata
+        const submissionData = {
+          formData: data,
+          recipientEmail: recipientEmail,
+          pageUrl: window.location.href,
+          pageTitle: document.title,
+          timestamp: new Date().toISOString(),
+          userAgent: navigator.userAgent,
+          referrer: document.referrer || 'Direct',
+          pageId: form.getAttribute('data-page-id') || 'unknown'
+        };
+        
+        try {
+          // Use absolute URL for the API endpoint to ensure it works on deployed static sites
+          const apiEndpoint = 'https://easy-landing-omega.vercel.app/api/submit-form';
+          console.log('Sending form data to:', apiEndpoint);
+          console.log('Form data:', submissionData);
+          
+          const response = await fetch(apiEndpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            mode: 'cors',
+            body: JSON.stringify(submissionData)
+          });
+          
+          const result = await response.json();
+          
+          if (response.ok && result.success) {
+            // Success
+            if (message) {
+              message.className = 'form-message success';
+              message.textContent = result.message || 'Thank you! Your message has been sent successfully.';
+              message.style.display = 'block';
+            }
+            form.reset();
+            
+            // Track successful submission
+            if (typeof gtag !== 'undefined') {
+              gtag('event', 'form_submit', {
+                'event_category': 'engagement',
+                'event_label': 'custom_form',
+                'custom_parameters': {
+                  'recipient_email': recipientEmail
+                }
+              });
+            }
+          } else {
+            throw new Error(result.error || 'Submission failed');
+          }
+        } catch (error) {
+          // Error handling
+          if (message) {
+            message.className = 'form-message error';
+            message.textContent = 'Sorry, there was an error sending your message. Please try again or contact us directly.';
+            message.style.display = 'block';
+          }
+          console.error('Form submission error:', error);
+          
+          // Track error
+          if (typeof gtag !== 'undefined') {
+            gtag('event', 'form_error', {
+              'event_category': 'error',
+              'event_label': 'form_submission_failed'
+            });
+          }
+        } finally {
+          // Re-enable form
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = originalButtonText;
+          }
+        }
+      });
+      
+      // Real-time form validation
+      const inputs = form.querySelectorAll('input[required]');
+      inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+          validateField(this);
+        });
+        
+        input.addEventListener('input', function() {
+          if (this.classList.contains('error')) {
+            validateField(this);
+          }
+        });
+      });
+      
+      function validateField(field) {
+        const isValid = field.checkValidity();
+        
+        if (isValid) {
+          field.classList.remove('error');
+          field.style.borderColor = 'var(--border-color)';
+        } else {
+          field.classList.add('error');
+          field.style.borderColor = '#dc2626';
+        }
+      }
+      
+      // Clear message when user starts typing
+      form.addEventListener('input', function() {
+        if (message && message.style.display !== 'none') {
+          message.style.display = 'none';
+        }
+      });
+    }); // End DOMContentLoaded event listener
+
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+</script>
+</body>
+</html>

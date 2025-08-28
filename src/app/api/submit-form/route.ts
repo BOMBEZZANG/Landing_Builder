@@ -28,7 +28,49 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body: FormSubmission = await request.json();
+    let body: FormSubmission;
+    
+    // Check Content-Type to handle both JSON and form data submissions
+    const contentType = request.headers.get('content-type') || '';
+    
+    if (contentType.includes('application/json')) {
+      // JavaScript fetch request
+      body = await request.json();
+    } else {
+      // HTML form submission (application/x-www-form-urlencoded)
+      const formData = await request.formData();
+      
+      // Convert form data to our expected format
+      const formDataObj: Record<string, string> = {};
+      
+      formData.forEach((value, key) => {
+        if (typeof value === 'string') {
+          formDataObj[key] = value;
+        }
+      });
+      
+      // Extract metadata from form attributes or use defaults
+      const recipientEmail = formData.get('data-recipient-email') as string || 
+                           formData.get('recipientEmail') as string || 
+                           'test@example.com'; // fallback
+      
+      const pageId = formData.get('data-page-id') as string || 
+                    formData.get('pageId') as string || 
+                    'html-form-submission';
+      
+      // Remove metadata fields from form data
+      delete formDataObj['data-recipient-email'];
+      delete formDataObj['data-page-id'];
+      delete formDataObj['recipientEmail'];
+      delete formDataObj['pageId'];
+      
+      body = {
+        formData: formDataObj,
+        recipientEmail,
+        pageId,
+        timestamp: new Date().toISOString()
+      };
+    }
 
     // Validate required fields
     if (!body.recipientEmail) {

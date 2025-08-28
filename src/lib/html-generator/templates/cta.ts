@@ -33,14 +33,18 @@ export function generateCTAHTML(section: CTASection): string {
   }
   
   // Generate form or button
+  const apiUrl = 'https://easy-landing-omega.vercel.app';
   const actionHTML = data.formEnabled ? `
     <form id="contact-form" class="form-container" 
           method="POST"
-          action="#"
+          action="${apiUrl}/api/submit-form"
           data-form-handler="true"
           data-page-id="landing-page-${Date.now()}"
           data-recipient-email="${escapeHTML(data.recipientEmail)}"
-          data-endpoint="/api/submit-form">
+          data-endpoint="${apiUrl}/api/submit-form">
+      <!-- Hidden fields for form metadata -->
+      <input type="hidden" name="recipientEmail" value="${escapeHTML(data.recipientEmail)}">
+      <input type="hidden" name="pageId" value="landing-page-${Date.now()}">
       ${formFields.join('')}
       <button type="submit" class="btn cta-button" style="background-color: ${data.buttonColor}; color: white;">
         ${escapeHTML(data.buttonText)}
