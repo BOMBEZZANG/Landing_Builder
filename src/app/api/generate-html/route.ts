@@ -11,6 +11,7 @@ interface GenerateHtmlRequest {
     includeMeta?: boolean;
     includeAnimations?: boolean;
     optimizeImages?: boolean;
+    formService?: 'formspree' | 'custom' | 'netlify-forms';
   };
 }
 
@@ -47,7 +48,8 @@ export async function POST(request: NextRequest) {
       includeAnalytics: false,
       includeMeta: true,
       includeAnimations: true,
-      optimizeImages: true
+      optimizeImages: true,
+      formService: 'custom' as const // Ensure we use custom form handler
     };
 
     const options = { ...defaultOptions, ...body.options };

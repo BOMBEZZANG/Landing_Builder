@@ -33,7 +33,7 @@ export class HTMLGenerator {
       minify: true,
       inlineCSS: true,
       includeAnalytics: false,
-      formService: 'formspree',
+      formService: 'custom', // Changed to use our custom API
       includeAnimations: true,
       ...options
     };

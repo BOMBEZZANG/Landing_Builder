@@ -176,8 +176,9 @@ function generateNetlifyHandler(ctaSection: CTASection): string {
 }
 
 function generateCustomHandler(ctaSection: CTASection): string {
-  // Use the production API URL or fallback to a configurable endpoint
-  const apiUrl = process.env.NEXT_PUBLIC_PRODUCTION_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://landing-page-builder-api.vercel.app';
+  // IMPORTANT: This URL must point to your deployed landing page builder API
+  // The generated HTML will use this URL to submit forms
+  const apiUrl = 'https://easy-landing-omega.vercel.app';
   return `
     (function() {
       const form = document.getElementById('contact-form');
