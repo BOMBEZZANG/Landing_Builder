@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
           subject: `New form submission from ${body.pageId || 'Landing Page'}`,
           html: emailContent.html,
           text: emailContent.text,
-          reply_to: body.formData.email || undefined, // If submitter provided email, set as reply-to
+          replyTo: body.formData.email || undefined, // If submitter provided email, set as reply-to
         });
 
         console.log('Email sent successfully:', emailResult);
