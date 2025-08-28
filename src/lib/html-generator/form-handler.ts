@@ -37,7 +37,7 @@ function generateFormspreeHandler(ctaSection: CTASection): string {
         // Disable button and show loading
         if (submitButton) {
           submitButton.disabled = true;
-          submitButton.innerHTML = '<span class="spinner"></span> Sending...';
+          submitButton.innerHTML = "<span class=\\"spinner\\"></span> Sending...";
         }
         
         // Hide any existing messages
@@ -153,12 +153,12 @@ function generateNetlifyHandler(ctaSection: CTASection): string {
       form.appendChild(honeypot);
       
       form.addEventListener('submit', function(e) {
-        const submitButton = form.querySelector('button[type="submit"]');
+        const submitButton = form.querySelector("button[type=\\"submit\\"]");
         
         // Show loading state
         if (submitButton) {
           submitButton.disabled = true;
-          submitButton.innerHTML = '<span class="spinner"></span> Sending...';
+          submitButton.innerHTML = "<span class=\\"spinner\\"></span> Sending...";
         }
         
         // Netlify handles the submission automatically
@@ -225,39 +225,39 @@ function generateCustomHandler(ctaSection: CTASection): string {
   const apiUrl = 'https://easy-landing-omega.vercel.app';
   return `
     // Debug: Script is executing
-    console.log('Form handler script loaded');
+    console.log("Form handler script loaded");
     
     // Wait for DOM to be fully loaded
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('DOM loaded, looking for contact form...');
-      const form = document.getElementById('contact-form');
+    document.addEventListener("DOMContentLoaded", function() {
+      console.log("DOM loaded, looking for contact form...");
+      const form = document.getElementById("contact-form");
       if (!form) {
-        console.error('Contact form not found - checking all forms:', document.querySelectorAll('form'));
+        console.error("Contact form not found - checking all forms:", document.querySelectorAll("form"));
         return;
       }
       
-      console.log('Form handler initialized successfully - Form found:', form);
+      console.log("Form handler initialized successfully - Form found:", form);
       
       // Ensure form doesn't have action or method that could cause redirect
-      form.removeAttribute('action');
-      form.removeAttribute('method');
+      form.removeAttribute("action");
+      form.removeAttribute("method");
       
-      const message = document.getElementById('form-message');
-      const recipientEmail = '${ctaSection.data.recipientEmail}';
+      const message = document.getElementById("form-message");
+      const recipientEmail = "${ctaSection.data.recipientEmail}";
       
-      console.log('Adding submit event listener to form');
-      form.addEventListener('submit', async function(e) {
+      console.log("Adding submit event listener to form");
+      form.addEventListener("submit", async function(e) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('🚀 FORM SUBMITTED! - Event intercepted successfully');
+        console.log("🚀 FORM SUBMITTED! - Event intercepted successfully");
         
-        const submitButton = form.querySelector('button[type="submit"]');
-        const originalButtonText = submitButton ? submitButton.textContent : 'Submit';
+        const submitButton = form.querySelector("button[type=\\"submit\\"]");
+        const originalButtonText = submitButton ? submitButton.textContent : "Submit";
         
         // Disable form and show loading state
         if (submitButton) {
           submitButton.disabled = true;
-          submitButton.innerHTML = '<span class="spinner"></span> Sending...';
+          submitButton.innerHTML = "<span class=\\"spinner\\"></span> Sending...";
         }
         
         // Hide any existing messages
