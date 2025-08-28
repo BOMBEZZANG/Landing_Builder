@@ -123,16 +123,26 @@ export async function POST(request: NextRequest) {
         // If email sending fails, we should know about it
         if (!emailResult.data?.id) {
           console.error('Email may not have been sent - no ID returned');
+          
+          // Check if this might be a sandbox domain restriction
+          const fromAddress = process.env.EMAIL_FROM_ADDRESS || 'onboarding@resend.dev';
+          if (fromAddress.includes('resend.dev')) {
+            console.warn(`Using sandbox domain (${fromAddress}) - emails may only be delivered to verified addresses`);
+          }
         }
       } catch (emailError) {
         console.error('Email send error:', emailError);
+        
         // Log the full error for debugging
         if (emailError instanceof Error) {
+          const fromAddress = process.env.EMAIL_FROM_ADDRESS || 'onboarding@resend.dev';
           console.error('Error details:', {
             message: emailError.message,
             stack: emailError.stack,
             recipientEmail: body.recipientEmail,
-            apiKeyPresent: !!process.env.RESEND_API_KEY
+            fromAddress: fromAddress,
+            apiKeyPresent: !!process.env.RESEND_API_KEY,
+            sandboxWarning: fromAddress.includes('resend.dev') ? 'Using sandbox domain - may only deliver to verified emails' : null
           });
         }
       }
