@@ -15,6 +15,18 @@ if (process.env.RESEND_API_KEY) {
 }
 
 export async function POST(request: NextRequest) {
+  // Add CORS headers to allow requests from deployed static sites
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Accept',
+  };
+
+  // Handle preflight requests
+  if (request.method === 'OPTIONS') {
+    return new NextResponse(null, { status: 200, headers: corsHeaders });
+  }
+
   try {
     const body: FormSubmission = await request.json();
 
@@ -22,14 +34,14 @@ export async function POST(request: NextRequest) {
     if (!body.recipientEmail) {
       return NextResponse.json(
         { error: 'Recipient email is required' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
     if (!body.formData || Object.keys(body.formData).length === 0) {
       return NextResponse.json(
         { error: 'Form data is required' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -37,7 +49,7 @@ export async function POST(request: NextRequest) {
     if (!isValidEmail(body.recipientEmail)) {
       return NextResponse.json(
         { error: 'Invalid recipient email format' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -56,18 +68,34 @@ export async function POST(request: NextRequest) {
     if (resend) {
       try {
         const emailResult = await resend.emails.send({
-          from: process.env.EMAIL_FROM_ADDRESS || 'noreply@landingpages.com',
+          from: process.env.EMAIL_FROM_ADDRESS || 'onboarding@resend.dev',
           to: body.recipientEmail,
           subject: `New form submission from ${body.pageId || 'Landing Page'}`,
           html: emailContent.html,
-          text: emailContent.text
+          text: emailContent.text,
+          reply_to: body.formData.email || undefined, // If submitter provided email, set as reply-to
         });
 
-        console.log('Email sent successfully:', emailResult.data);
+        console.log('Email sent successfully:', emailResult);
+        
+        // If email sending fails, we should know about it
+        if (!emailResult.data?.id) {
+          console.error('Email may not have been sent - no ID returned');
+        }
       } catch (emailError) {
         console.error('Email send error:', emailError);
-        // Continue without failing - log for debugging
+        // Log the full error for debugging
+        if (emailError instanceof Error) {
+          console.error('Error details:', {
+            message: emailError.message,
+            stack: emailError.stack,
+            recipientEmail: body.recipientEmail,
+            apiKeyPresent: !!process.env.RESEND_API_KEY
+          });
+        }
       }
+    } else {
+      console.warn('Resend API key not configured - emails will not be sent');
     }
 
     // Log form submission (in production, you might want to store this in a database)
@@ -78,13 +106,13 @@ export async function POST(request: NextRequest) {
       data: sanitizedData
     });
 
-    // Return success response
+    // Return success response with CORS headers
     return NextResponse.json({
       success: true,
       message: 'Form submission received successfully',
       submissionId: generateSubmissionId(),
       timestamp: new Date().toISOString()
-    });
+    }, { headers: corsHeaders });
 
   } catch (error) {
     console.error('Form submission error:', error);
@@ -94,12 +122,18 @@ export async function POST(request: NextRequest) {
         error: error instanceof Error ? error.message : 'Form submission failed',
         success: false 
       },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
 
 export async function GET() {
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Accept',
+  };
+
   return NextResponse.json({
     message: 'Form Submission API',
     endpoints: {
@@ -107,7 +141,17 @@ export async function GET() {
     },
     requiredFields: ['recipientEmail', 'formData'],
     optionalFields: ['pageId', 'timestamp']
-  });
+  }, { headers: corsHeaders });
+}
+
+export async function OPTIONS() {
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Accept',
+  };
+  
+  return new NextResponse(null, { status: 200, headers: corsHeaders });
 }
 
 // Utility functions

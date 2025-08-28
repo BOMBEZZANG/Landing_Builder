@@ -176,7 +176,8 @@ function generateNetlifyHandler(ctaSection: CTASection): string {
 }
 
 function generateCustomHandler(ctaSection: CTASection): string {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+  // Use the production API URL or fallback to a configurable endpoint
+  const apiUrl = process.env.NEXT_PUBLIC_PRODUCTION_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://landing-page-builder-api.vercel.app';
   return `
     (function() {
       const form = document.getElementById('contact-form');
@@ -217,17 +218,20 @@ function generateCustomHandler(ctaSection: CTASection): string {
           pageTitle: document.title,
           timestamp: new Date().toISOString(),
           userAgent: navigator.userAgent,
-          referrer: document.referrer || 'Direct'
+          referrer: document.referrer || 'Direct',
+          pageId: form.getAttribute('data-page-id') || 'unknown'
         };
         
         try {
-          // Use the API endpoint - can be configured for production deployment  
+          // Use absolute URL for the API endpoint to ensure it works on deployed static sites
           const apiEndpoint = '${apiUrl}/api/submit-form';
           const response = await fetch(apiEndpoint, {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
             },
+            mode: 'cors',
             body: JSON.stringify(submissionData)
           });
           
