@@ -92,8 +92,8 @@ export class HTMLGenerator {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     
-    <!-- Content Security Policy - Allow inline scripts and external API calls -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; connect-src 'self' https://easy-landing-omega.vercel.app https://api.resend.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
+    <!-- Content Security Policy - Allow inline scripts, eval for deployment platforms, and external API calls -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://vercel.live; connect-src 'self' https://easy-landing-omega.vercel.app https://api.resend.com https://vercel.live wss://vercel.live https://vitals.vercel-insights.com; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
     
     <!-- SEO Meta Tags -->
     <title>${this.escapeHTML(pageState.title || 'Landing Page')}</title>
