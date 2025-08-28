@@ -1,6 +1,7 @@
 import React from 'react';
 import { Section } from '@/types/builder.types';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/components/i18n/I18nProvider';
 
 interface SectionListProps {
   sections: Section[];
@@ -13,6 +14,7 @@ export default function SectionList({
   selectedSectionId,
   onSelectSection
 }: SectionListProps) {
+  const { t } = useTranslation();
   const getSectionIcon = (type: Section['type']) => {
     switch (type) {
       case 'hero':
@@ -45,13 +47,13 @@ export default function SectionList({
   const getSectionTitle = (section: Section) => {
     switch (section.type) {
       case 'hero':
-        return section.data.headline || 'Hero Section';
+        return section.data.headline || t('builder.sections.hero');
       case 'content':
-        return section.data.title || 'Content Section';
+        return section.data.title || t('builder.sections.content');
       case 'cta':
-        return section.data.title || 'CTA Section';
+        return section.data.title || t('builder.sections.ctaSection');
       default:
-        return 'Section';
+        return t('builder.sections.hero');
     }
   };
 

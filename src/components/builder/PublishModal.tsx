@@ -3,6 +3,7 @@ import { AlertCircle, CheckCircle, Mail, X, ExternalLink, Globe, Zap, Copy, Chec
 import { PageState, PublishSettings, DeploymentStatus, PublishValidationResult } from '@/types/builder.types';
 import { validateForPublishing } from '@/utils/validation';
 import Button from '@/components/ui/Button';
+import { useTranslation } from '@/components/i18n/I18nProvider';
 
 interface PublishModalProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface PublishModalProps {
 }
 
 export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalProps) {
+  const { t } = useTranslation();
   const [validation, setValidation] = useState<PublishValidationResult | null>(null);
   const [isPublishing, setIsPublishing] = useState(false);
   const [deploymentStatus, setDeploymentStatus] = useState<DeploymentStatus | null>(null);
@@ -144,8 +146,8 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
               </svg>
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">Publish Landing Page</h2>
-              <p className="text-sm text-gray-600">Make your page live on the web</p>
+              <h2 className="text-lg font-semibold text-gray-900">{t('modals.publishModal.title')}</h2>
+              <p className="text-sm text-gray-600">{t('modals.publishModal.subtitle')}</p>
             </div>
           </div>
           <button
@@ -168,7 +170,7 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
                   <div className="flex items-start space-x-3">
                     <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                     <div>
-                      <h3 className="font-medium text-red-900 mb-2">Cannot publish yet</h3>
+                      <h3 className="font-medium text-red-900 mb-2">{t('modals.publishModal.cannotPublishYet')}</h3>
                       <ul className="space-y-1">
                         {validation.errors.map((error, index) => (
                           <li key={index} className="text-sm text-red-700 flex items-center">
@@ -180,7 +182,7 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
                       <div className="mt-3 p-3 bg-red-100 rounded-md">
                         <p className="text-sm text-red-800 flex items-center">
                           <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
-                          <strong>Email Setup Required:</strong> Configure your recipient email in the CTA section to receive form submissions.
+                          <strong>{t('modals.publishModal.emailSetupRequired')}:</strong> {t('modals.publishModal.configureRecipientEmail')}
                         </p>
                       </div>
                     </div>
@@ -191,8 +193,8 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
                   <div className="flex items-start space-x-3">
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                     <div>
-                      <h3 className="font-medium text-green-900 mb-1">Ready to publish!</h3>
-                      <p className="text-sm text-green-700">Your landing page meets all requirements.</p>
+                      <h3 className="font-medium text-green-900 mb-1">{t('modals.publishModal.readyToPublish')}</h3>
+                      <p className="text-sm text-green-700">{t('modals.publishModal.meetsAllRequirements')}</p>
                     </div>
                   </div>
                 </div>
@@ -204,7 +206,7 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
                   <div className="flex items-start space-x-3">
                     <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                     <div>
-                      <h3 className="font-medium text-amber-900 mb-2">Recommendations</h3>
+                      <h3 className="font-medium text-amber-900 mb-2">{t('modals.publishModal.recommendations')}</h3>
                       <ul className="space-y-1">
                         {validation.warnings.map((warning, index) => (
                           <li key={index} className="text-sm text-amber-700 flex items-center">
@@ -221,25 +223,7 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
               {/* Publishing Information */}
               {validation.canPublish && (
                 <div className="border border-gray-200 rounded-lg p-4">
-                  <h3 className="font-medium text-gray-900 mb-3">What happens when you publish?</h3>
-                  <ul className="space-y-2 text-sm text-gray-600">
-                    <li className="flex items-start">
-                      <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-2 flex-shrink-0 mt-2"></span>
-                      Your landing page will be generated as optimized HTML
-                    </li>
-                    <li className="flex items-start">
-                      <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-2 flex-shrink-0 mt-2"></span>
-                      Deployed to GitHub Pages with automatic SSL
-                    </li>
-                    <li className="flex items-start">
-                      <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-2 flex-shrink-0 mt-2"></span>
-                      Form submissions will be handled via Netlify Forms
-                    </li>
-                    <li className="flex items-start">
-                      <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-2 flex-shrink-0 mt-2"></span>
-                      You can make updates and republish anytime
-                    </li>
-                  </ul>
+                  <h3 className="font-medium text-gray-900 mb-3">{t('modals.publishModal.whatHappensWhenPublish')}</h3>
                 </div>
               )}
             </>
@@ -252,22 +236,16 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
             <div className="text-center space-y-4">
               <div className="animate-spin w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Publishing Your Page</h3>
-                <p className="text-sm text-gray-600">This may take a few moments...</p>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">{t('modals.publishModal.publishingTitle')}</h3>
+                <p className="text-sm text-gray-600">{t('modals.publishModal.publishingSubtitle')}</p>
               </div>
               <div className="bg-gray-50 rounded-lg p-4">
-                <div className="space-y-2 text-sm text-gray-600">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                    <span>Generating optimized HTML</span>
+                <div className="space-y-2 text-sm text-gray-600 text-center">
+                  <div className="whitespace-pre-line">
+                    {t('modals.publishModal.publishingMessage')}
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                    <span>Deploying to GitHub Pages</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                    <span>Setting up form handling</span>
+                  <div className="text-xs text-gray-500 mt-2">
+                    {t('modals.publishModal.pleaseDoNotClose')}
                   </div>
                 </div>
               </div>
@@ -279,8 +257,8 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
             <div className="text-center space-y-4">
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Successfully Published!</h3>
-                <p className="text-sm text-gray-600">Your landing page is now live on the web</p>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">{t('modals.publishModal.successTitle')}</h3>
+                <p className="text-sm text-gray-600">{t('modals.publishModal.successSubtitle')}</p>
               </div>
               {deploymentStatus && (
                 <div className="space-y-4">
@@ -290,7 +268,7 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center space-x-2">
                           <Globe className="w-5 h-5 text-green-600" />
-                          <span className="font-medium text-green-900">Your Landing Page URL:</span>
+                          <span className="font-medium text-green-900">{t('modals.publishModal.yourLandingPageUrl')}</span>
                         </div>
                         <a
                           href={getDisplayUrl(deploymentStatus)}
@@ -298,7 +276,7 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
                           rel="noopener noreferrer"
                           className="inline-flex items-center space-x-1 text-blue-600 hover:text-blue-700 font-medium"
                         >
-                          <span>View Page</span>
+                          <span>{t('modals.publishModal.viewPage')}</span>
                           <ExternalLink className="w-4 h-4" />
                         </a>
                       </div>
@@ -309,7 +287,7 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
                         <button
                           onClick={() => copyToClipboard(getDisplayUrl(deploymentStatus))}
                           className="flex items-center justify-center w-8 h-8 text-green-600 hover:text-green-700 hover:bg-green-200 rounded-md transition-colors"
-                          title="Copy URL"
+                          title={t('modals.publishModal.copyUrl')}
                         >
                           {copiedUrl === getDisplayUrl(deploymentStatus) ? (
                             <Check className="w-4 h-4" />
@@ -319,7 +297,7 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
                         </button>
                       </div>
                       {copiedUrl === getDisplayUrl(deploymentStatus) && (
-                        <div className="mt-2 text-xs text-green-600 font-medium">✓ URL copied to clipboard!</div>
+                        <div className="mt-2 text-xs text-green-600 font-medium">✓ {t('modals.publishModal.urlCopied')}</div>
                       )}
                     </div>
                   )}
@@ -328,7 +306,7 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
                   {/* Additional Info */}
                   <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
                     <div className="text-center text-sm text-gray-600">
-                      🎉 Your landing page is now live! Share this URL to get visitors.
+                      {t('modals.publishModal.successMessage')}
                     </div>
                   </div>
                 </div>
@@ -346,7 +324,7 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
                 onClick={onClose}
                 disabled={isPublishing}
               >
-                Cancel
+{t('modals.publishModal.cancel')}
               </Button>
               
               {validation?.canPublish ? (
@@ -356,11 +334,11 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
                   disabled={isPublishing}
                 >
                   <Zap className="w-4 h-4 mr-2" />
-                  Publish Now
+                  {t('modals.publishModal.publishNow')}
                 </Button>
               ) : (
                 <div className="text-sm text-gray-500">
-                  Fix the issues above to continue
+                  {t('modals.publishModal.fixIssuesBelow')}
                 </div>
               )}
             </>
@@ -372,7 +350,7 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
             <>
               <div></div>
               <div className="text-sm text-gray-500">
-                Publishing in progress...
+                {t('modals.publishModal.publishingInProgress')}
               </div>
             </>
           )}
@@ -383,7 +361,7 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
                 variant="outline"
                 onClick={onClose}
               >
-                Close
+                {t('modals.publishModal.close')}
               </Button>
               
               {(deploymentStatus?.url || deploymentStatus?.netlifyUrl) && (
@@ -393,7 +371,7 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
                   className="flex items-center space-x-2"
                 >
                   <ExternalLink className="w-4 h-4" />
-                  <span>View Live Page</span>
+                  <span>{t('modals.publishModal.viewLivePage')}</span>
                 </Button>
               )}
             </>

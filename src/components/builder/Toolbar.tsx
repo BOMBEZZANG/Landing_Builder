@@ -111,7 +111,7 @@ export default function Toolbar({
       {/* Center - Page info and Device Selector */}
       <div className="flex items-center space-x-4">
         <div className="flex items-center space-x-2 text-sm text-gray-600">
-          <span>Untitled Page</span>
+          <span>{t('builder.untitledPage')}</span>
           <span className="text-gray-400">•</span>
           <span className={cn(
             isPreviewMode ? 'text-green-600' : 'text-blue-600'

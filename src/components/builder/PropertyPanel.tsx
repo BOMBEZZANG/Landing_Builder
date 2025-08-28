@@ -6,6 +6,7 @@ import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
 import { EmailSettingsSection } from '@/components/builder/PropertyPanels/EmailSettingsSection';
+import { useTranslation } from '@/components/i18n/I18nProvider';
 
 interface PropertyPanelProps {
   selectedSection: Section | null;
@@ -24,6 +25,7 @@ export default function PropertyPanel({
   globalStyles,
   onUpdateGlobalStyles
 }: PropertyPanelProps) {
+  const { t } = useTranslation();
   const PropertyGroup = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <div className="border-b border-gray-200 pb-4 mb-4 last:border-b-0 last:pb-0 last:mb-0">
       <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
@@ -37,15 +39,15 @@ export default function PropertyPanel({
 
   const renderHeroProperties = (section: Extract<Section, { type: 'hero' }>) => (
     <>
-      <PropertyGroup title="Background">
+      <PropertyGroup title={t('builder.properties.background')}>
         <Select
-          label="Background Type"
+          label={t('builder.properties.backgroundType')}
           value={section.data.backgroundType}
           onChange={(e) => onUpdateSection({ backgroundType: e.target.value as any })}
           options={[
-            { value: 'color', label: 'Solid Color' },
-            { value: 'gradient', label: 'Gradient' },
-            { value: 'image', label: 'Image' }
+            { value: 'color', label: t('builder.properties.color') },
+            { value: 'gradient', label: t('builder.properties.gradient') },
+            { value: 'image', label: t('builder.properties.image') }
           ]}
         />
         
@@ -195,7 +197,7 @@ export default function PropertyPanel({
         />
       </PropertyGroup>
 
-      <PropertyGroup title="Form Settings">
+      <PropertyGroup title={t('builder.properties.formSettings')}>
         <div className="space-y-2">
           <label className="flex items-center">
             <input
@@ -204,7 +206,7 @@ export default function PropertyPanel({
               onChange={(e) => onUpdateSection({ formEnabled: e.target.checked })}
               className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
-            <span className="ml-2 text-sm text-gray-700">Enable form</span>
+            <span className="ml-2 text-sm text-gray-700">{t('form.settings.enableForm')}</span>
           </label>
         </div>
       </PropertyGroup>
@@ -220,9 +222,9 @@ export default function PropertyPanel({
       )}
 
       {section.data.formEnabled && (
-        <PropertyGroup title="Form Fields">
+        <PropertyGroup title={t('builder.properties.formFields')}>
           <div className="space-y-2">
-            <p className="text-sm font-medium text-gray-700">Select fields to show on your form</p>
+            <p className="text-sm font-medium text-gray-700">{t('form.settings.selectFieldsToShow')}</p>
             
             <label className="flex items-center">
               <input
@@ -233,7 +235,7 @@ export default function PropertyPanel({
                 })}
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="ml-2 text-sm text-gray-700">Name field</span>
+              <span className="ml-2 text-sm text-gray-700">{t('form.settings.nameField')}</span>
             </label>
             
             <label className="flex items-center">
@@ -245,7 +247,7 @@ export default function PropertyPanel({
                 })}
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="ml-2 text-sm text-gray-700">Email field</span>
+              <span className="ml-2 text-sm text-gray-700">{t('form.settings.emailField')}</span>
             </label>
             
             <label className="flex items-center">
@@ -257,7 +259,7 @@ export default function PropertyPanel({
                 })}
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="ml-2 text-sm text-gray-700">Phone field</span>
+              <span className="ml-2 text-sm text-gray-700">{t('form.settings.phoneField')}</span>
             </label>
           </div>
         </PropertyGroup>
@@ -283,26 +285,26 @@ export default function PropertyPanel({
             />
           </svg>
         </div>
-        <p className="text-gray-600 mb-2">No section selected</p>
-        <p className="text-sm text-gray-400">Click on a section to edit its properties</p>
+        <p className="text-gray-600 mb-2">{t('builder.properties.noSectionSelected')}</p>
+        <p className="text-sm text-gray-400">{t('builder.properties.clickToEditProperties')}</p>
         
         {/* Global styles section */}
         <div className="mt-8 text-left">
-          <PropertyGroup title="Global Styles">
+          <PropertyGroup title={t('builder.properties.globalStyles')}>
             <ColorPicker
-              label="Primary Color"
+              label={t('builder.properties.primaryColor')}
               color={globalStyles.primaryColor}
               onChange={(color) => onUpdateGlobalStyles({ primaryColor: color })}
             />
             
             <ColorPicker
-              label="Secondary Color"
+              label={t('builder.properties.secondaryColor')}
               color={globalStyles.secondaryColor}
               onChange={(color) => onUpdateGlobalStyles({ secondaryColor: color })}
             />
             
             <Select
-              label="Font Family"
+              label={t('builder.properties.fontFamily')}
               value={globalStyles.fontFamily}
               onChange={(e) => onUpdateGlobalStyles({ fontFamily: e.target.value as any })}
               options={FONT_OPTIONS.map(f => ({ value: f.value, label: f.name }))}
@@ -319,7 +321,7 @@ export default function PropertyPanel({
         <div className="flex items-center space-x-2">
           <div className="w-2 h-2 bg-builder-selected rounded-full"></div>
           <span className="text-sm font-medium text-gray-700">
-            {selectedSection.type.charAt(0).toUpperCase() + selectedSection.type.slice(1)} Section
+            {selectedSection.type === 'hero' ? t('builder.sections.hero') : selectedSection.type === 'content' ? t('builder.sections.content') : selectedSection.type === 'cta' ? t('builder.sections.ctaSection') : 'Section'}
           </span>
         </div>
       </div>
@@ -329,7 +331,7 @@ export default function PropertyPanel({
       {selectedSection.type === 'cta' && renderCTAProperties(selectedSection)}
       
       {/* Quick Actions */}
-      <PropertyGroup title="Quick Actions">
+      <PropertyGroup title={t('builder.properties.quickActions')}>
         <div className="grid grid-cols-2 gap-2">
           <Button
             variant="outline"
@@ -339,7 +341,7 @@ export default function PropertyPanel({
               console.log('Reset section to defaults');
             }}
           >
-            Reset
+            {t('common.reset')}
           </Button>
           <Button
             variant="outline"
@@ -349,7 +351,7 @@ export default function PropertyPanel({
               console.log('Duplicate section');
             }}
           >
-            Duplicate
+            {t('builder.properties.duplicate')}
           </Button>
         </div>
       </PropertyGroup>

@@ -23,7 +23,7 @@ interface I18nProviderProps {
 }
 
 export function I18nProvider({ children }: I18nProviderProps) {
-  const [locale, setLocaleState] = useState<Locale>('en');
+  const [locale, setLocaleState] = useState<Locale>('ko'); // Default to Korean
   const [translations, setTranslations] = useState<TranslationKeys | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 

@@ -49,17 +49,17 @@ export async function loadTranslations(locale: Locale): Promise<TranslationKeys>
  * Detect browser language preference
  */
 export function detectBrowserLanguage(): Locale {
-  if (typeof window === 'undefined') return 'en';
+  if (typeof window === 'undefined') return 'ko'; // Default to Korean for server-side
   
   const browserLang = navigator.language.toLowerCase();
   
-  // Check for Korean
-  if (browserLang.startsWith('ko')) {
-    return 'ko';
+  // Check for English
+  if (browserLang.startsWith('en')) {
+    return 'en';
   }
   
-  // Default to English
-  return 'en';
+  // Default to Korean for all other languages
+  return 'ko';
 }
 
 /**

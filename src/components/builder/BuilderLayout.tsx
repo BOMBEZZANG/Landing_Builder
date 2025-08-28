@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '@/components/i18n/I18nProvider';
 
 interface BuilderLayoutProps {
   children: React.ReactNode;
@@ -13,6 +14,7 @@ export default function BuilderLayout({
   rightPanel,
   toolbar
 }: BuilderLayoutProps) {
+  const { t } = useTranslation();
   return (
     <div className="h-screen flex flex-col bg-builder-bg">
       {/* Toolbar */}
@@ -26,7 +28,7 @@ export default function BuilderLayout({
         <div className="w-64 border-r border-builder-border bg-white overflow-y-auto flex-shrink-0">
           <div className="p-4">
             <h2 className="text-sm font-semibold text-gray-600 mb-4 uppercase tracking-wide">
-              Page Sections
+              {t('builder.sections.pageSections')}
             </h2>
             {leftPanel}
           </div>
@@ -43,7 +45,7 @@ export default function BuilderLayout({
         <div className="w-80 border-l border-builder-border bg-white overflow-y-auto flex-shrink-0">
           <div className="p-4">
             <h2 className="text-sm font-semibold text-gray-600 mb-4 uppercase tracking-wide">
-              Properties
+              {t('builder.properties.title')}
             </h2>
             {rightPanel}
           </div>

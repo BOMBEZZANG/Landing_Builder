@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Mail, AlertCircle, Check, CheckCircle, Info } from 'lucide-react';
 import { validateEmail, debounce } from '@/utils/validation';
+import { useTranslation } from '@/components/i18n/I18nProvider';
 
 interface EmailSettingsSectionProps {
   recipientEmail: string;
@@ -17,6 +18,7 @@ export function EmailSettingsSection({
   onEmailChange,
   onEmailVerified
 }: EmailSettingsSectionProps) {
+  const { t } = useTranslation();
   const [status, setStatus] = useState<ApplyStatus>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [validationMessage, setValidationMessage] = useState('');
@@ -98,15 +100,15 @@ export function EmailSettingsSection({
           </div>
           <div>
             <h3 className="font-semibold text-gray-900 flex items-center">
-              📮 Application Receiver Settings
+              {t('email.settings.applicationReceiverSettings')}
             </h3>
             <p className="text-sm text-gray-600">
-              You'll receive customer applications at this email
+              {t('email.settings.receiveApplicationsAt')}
             </p>
           </div>
         </div>
         <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-medium">
-          Required
+          {t('messages.info.required')}
         </span>
       </div>
       
@@ -114,15 +116,14 @@ export function EmailSettingsSection({
       <div className="mb-4 flex items-start space-x-2 p-3 bg-white bg-opacity-70 rounded-md">
         <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
         <p className="text-sm text-gray-700">
-          <span className="font-medium">Important:</span> This email is NOT visible to your customers. 
-          They will see the form fields you configure below.
+          <span className="font-medium">{t('messages.info.important')}:</span> {t('messages.info.notVisibleToCustomers')}.
         </p>
       </div>
       
       {/* Email Input */}
       <div>
         <label htmlFor="recipient-email" className="block text-sm font-medium text-gray-700 mb-1">
-          Your Business Email
+          {t('email.settings.yourBusinessEmail')}
         </label>
         <div className="flex space-x-2">
           <div className="flex-1">
@@ -132,7 +133,7 @@ export function EmailSettingsSection({
               type="email"
               value={recipientEmail}
               onChange={(e) => handleEmailChange(e.target.value)}
-              placeholder="your-email@company.com"
+              placeholder={t('form.placeholders.yourEmailCompany')}
               className={`w-full px-3 py-2 border rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 ${
                 hasError
                   ? 'border-red-300 focus:border-red-500'
@@ -163,7 +164,7 @@ export function EmailSettingsSection({
             {emailVerified && !validationMessage && (
               <p id="email-verified" className="mt-1 text-sm text-green-600 flex items-center">
                 <CheckCircle className="w-3 h-3 mr-1" />
-                Email applied successfully
+                {t('email.settings.emailAppliedSuccessfully')}
               </p>
             )}
           </div>
