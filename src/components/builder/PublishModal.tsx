@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, CheckCircle, Mail, X, ExternalLink, Settings, Globe, Zap, Copy, Check } from 'lucide-react';
+import { AlertCircle, CheckCircle, Mail, X, ExternalLink, Globe, Zap, Copy, Check } from 'lucide-react';
 import { PageState, PublishSettings, DeploymentStatus, PublishValidationResult } from '@/types/builder.types';
 import { validateForPublishing } from '@/utils/validation';
 import Button from '@/components/ui/Button';
@@ -17,15 +17,15 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
   const [deploymentStatus, setDeploymentStatus] = useState<DeploymentStatus | null>(null);
   const [publishSettings, setPublishSettings] = useState<PublishSettings>({
     userId: 'user-' + Date.now(),
-    enableAnalytics: false,
-    formService: 'formspree',
+    enableAnalytics: true,
+    formService: 'netlify-forms', // Default to Netlify Forms
     optimizations: {
       minify: true,
       optimizeImages: true,
       includeAnimations: true
     }
   });
-  const [currentStep, setCurrentStep] = useState<'validation' | 'settings' | 'deploying' | 'success'>('validation');
+  const [currentStep, setCurrentStep] = useState<'validation' | 'deploying' | 'success'>('validation');
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -48,8 +48,20 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
     setIsPublishing(true);
     setCurrentStep('deploying');
     
+    // Use default settings with Netlify Forms and all optimizations
+    const defaultSettings = {
+      ...publishSettings,
+      formService: 'netlify-forms' as const,
+      optimizations: {
+        minify: true,
+        optimizeImages: true,
+        includeAnimations: true
+      },
+      enableAnalytics: true
+    };
+    
     try {
-      const result = await onPublish(publishSettings);
+      const result = await onPublish(defaultSettings);
       console.log('Publish result:', result);
       console.log('Result has URL:', !!result?.url);
       console.log('Result has netlifyUrl:', !!result?.netlifyUrl);
@@ -78,17 +90,7 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
     }
   };
   
-  const handleNext = () => {
-    if (currentStep === 'validation' && validation?.canPublish) {
-      setCurrentStep('settings');
-    }
-  };
-  
-  const handleBack = () => {
-    if (currentStep === 'settings') {
-      setCurrentStep('validation');
-    }
-  };
+  // Removed handleNext and handleBack functions - no longer needed
 
   const copyToClipboard = async (url: string) => {
     try {
@@ -231,7 +233,7 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
                     </li>
                     <li className="flex items-start">
                       <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-2 flex-shrink-0 mt-2"></span>
-                      Form submissions will be handled via your chosen service
+                      Form submissions will be handled via Netlify Forms
                     </li>
                     <li className="flex items-start">
                       <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-2 flex-shrink-0 mt-2"></span>
@@ -243,109 +245,7 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
             </>
           )}
           
-          {/* Step: Settings */}
-          {currentStep === 'settings' && (
-            <div className="space-y-6">
-              <div className="text-center">
-                <Settings className="w-12 h-12 text-blue-500 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Publishing Settings</h3>
-                <p className="text-sm text-gray-600">Configure how your page will be published</p>
-              </div>
-              
-              {/* Form Service */}
-              <div className="space-y-3">
-                <label className="block text-sm font-medium text-gray-700">Form Handling Service</label>
-                <div className="space-y-2">
-                  {[
-                    { value: 'formspree', label: 'Formspree', description: 'Easy setup, reliable form handling' },
-                    { value: 'netlify-forms', label: 'Netlify Forms', description: 'Built-in Netlify form processing' },
-                    { value: 'custom', label: 'Custom API', description: 'Use your own form endpoint' }
-                  ].map(option => (
-                    <label key={option.value} className="flex items-start space-x-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
-                      <input
-                        type="radio"
-                        name="formService"
-                        value={option.value}
-                        checked={publishSettings.formService === option.value}
-                        onChange={(e) => setPublishSettings(prev => ({ ...prev, formService: e.target.value as any }))}
-                        className="mt-1"
-                      />
-                      <div>
-                        <div className="font-medium text-gray-900">{option.label}</div>
-                        <div className="text-sm text-gray-600">{option.description}</div>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Optimizations */}
-              <div className="space-y-3">
-                <label className="block text-sm font-medium text-gray-700">Optimizations</label>
-                <div className="space-y-3">
-                  <label className="flex items-center space-x-3">
-                    <input
-                      type="checkbox"
-                      checked={publishSettings.optimizations.minify}
-                      onChange={(e) => setPublishSettings(prev => ({
-                        ...prev,
-                        optimizations: { ...prev.optimizations, minify: e.target.checked }
-                      }))}
-                    />
-                    <div>
-                      <div className="font-medium text-gray-900">Minify HTML/CSS/JS</div>
-                      <div className="text-sm text-gray-600">Reduce file size for faster loading</div>
-                    </div>
-                  </label>
-                  
-                  <label className="flex items-center space-x-3">
-                    <input
-                      type="checkbox"
-                      checked={publishSettings.optimizations.optimizeImages}
-                      onChange={(e) => setPublishSettings(prev => ({
-                        ...prev,
-                        optimizations: { ...prev.optimizations, optimizeImages: e.target.checked }
-                      }))}
-                    />
-                    <div>
-                      <div className="font-medium text-gray-900">Optimize Images</div>
-                      <div className="text-sm text-gray-600">Add lazy loading and responsive attributes</div>
-                    </div>
-                  </label>
-                  
-                  <label className="flex items-center space-x-3">
-                    <input
-                      type="checkbox"
-                      checked={publishSettings.optimizations.includeAnimations}
-                      onChange={(e) => setPublishSettings(prev => ({
-                        ...prev,
-                        optimizations: { ...prev.optimizations, includeAnimations: e.target.checked }
-                      }))}
-                    />
-                    <div>
-                      <div className="font-medium text-gray-900">Include Animations</div>
-                      <div className="text-sm text-gray-600">Add smooth transitions and effects</div>
-                    </div>
-                  </label>
-                </div>
-              </div>
-              
-              {/* Analytics */}
-              <div className="space-y-3">
-                <label className="flex items-center space-x-3">
-                  <input
-                    type="checkbox"
-                    checked={publishSettings.enableAnalytics}
-                    onChange={(e) => setPublishSettings(prev => ({ ...prev, enableAnalytics: e.target.checked }))}
-                  />
-                  <div>
-                    <div className="font-medium text-gray-900">Enable Analytics</div>
-                    <div className="text-sm text-gray-600">Track page views and form submissions</div>
-                  </div>
-                </label>
-              </div>
-            </div>
-          )}
+          {/* Settings step removed - using default configuration */}
           
           {/* Step: Deploying */}
           {currentStep === 'deploying' && (
@@ -452,10 +352,11 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
               {validation?.canPublish ? (
                 <Button
                   variant="primary"
-                  onClick={handleNext}
+                  onClick={handlePublish}
+                  disabled={isPublishing}
                 >
-                  <Settings className="w-4 h-4 mr-2" />
-                  Configure Settings
+                  <Zap className="w-4 h-4 mr-2" />
+                  Publish Now
                 </Button>
               ) : (
                 <div className="text-sm text-gray-500">
@@ -465,26 +366,7 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
             </>
           )}
           
-          {currentStep === 'settings' && (
-            <>
-              <Button
-                variant="outline"
-                onClick={handleBack}
-              >
-                Back
-              </Button>
-              
-              <Button
-                variant="primary"
-                onClick={handlePublish}
-                disabled={isPublishing}
-                className="flex items-center space-x-2"
-              >
-                <Zap className="w-4 h-4" />
-                <span>Publish Now</span>
-              </Button>
-            </>
-          )}
+          {/* Settings footer removed - no longer needed */}
           
           {currentStep === 'deploying' && (
             <>
