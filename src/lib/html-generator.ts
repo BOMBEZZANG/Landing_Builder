@@ -109,7 +109,7 @@ export class HTMLGenerator {
         .replace('{{FAVICON}}', metadata.favicon || '')
         .replace('{{CSS}}', css)
         .replace('{{BODY_CONTENT}}', sectionsHTML)
-        .replace('{{SCRIPTS}}', js)
+        .replace('{{SCRIPTS}}', this.escapeJavaScript(js))
         .replace('{{ANALYTICS}}', options.includeAnalytics ? this.generateAnalytics() : '');
 
       // Collect assets
@@ -553,6 +553,16 @@ export class HTMLGenerator {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
     }
+  }
+
+  private escapeJavaScript(js: string): string {
+    // Ensure JavaScript is safely embedded in HTML
+    if (!js || typeof js !== 'string') {
+      return '';
+    }
+    
+    // Escape closing script tags that could break the HTML structure
+    return js.replace(/<\/script>/gi, '<\\/script>');
   }
 
   private extractImageUrls(html: string): string[] {

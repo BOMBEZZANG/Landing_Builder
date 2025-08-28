@@ -161,7 +161,7 @@ export class HTMLGenerator {
     }
     
     return scripts.length > 0 
-      ? `<script>\n${scripts.join('\n\n')}\n</script>`
+      ? `<script>\n${this.escapeScriptContent(scripts.join('\n\n'))}\n</script>`
       : '';
   }
   
@@ -179,6 +179,16 @@ export class HTMLGenerator {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
+  }
+  
+  private escapeScriptContent(scriptContent: string): string {
+    // Escape script content to prevent HTML injection and ensure valid JavaScript
+    return scriptContent
+      // Escape closing script tags to prevent breaking out of the script block
+      .replace(/<\/script>/gi, '<\\/script>')
+      // Escape HTML comment sequences that could cause issues
+      .replace(/<!--/g, '\\x3C!--')
+      .replace(/-->/g, '--\\x3E');
   }
   
   private generateChecksum(html: string): string {
