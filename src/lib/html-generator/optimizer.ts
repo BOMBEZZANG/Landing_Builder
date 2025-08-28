@@ -1,17 +1,17 @@
 export function optimizeHTML(html: string): string {
   let optimized = html;
   
-  // 1. Remove comments (but preserve IE conditional comments)
-  optimized = removeComments(optimized);
+  // 1. Skip all optimization to avoid breaking JavaScript
+  // optimized = removeComments(optimized);
   
-  // 2. Remove unnecessary whitespace
-  optimized = removeWhitespace(optimized);
+  // 2. Skip whitespace removal as it's breaking JavaScript strings
+  // optimized = removeWhitespace(optimized);
   
-  // 3. Minify inline CSS
-  optimized = minifyCSS(optimized);
+  // 3. Skip CSS minification to avoid issues with strings in JS
+  // optimized = minifyCSS(optimized);
   
-  // 4. Minify inline JavaScript
-  optimized = minifyJS(optimized);
+  // 4. Skip JavaScript minification to avoid breaking URLs and syntax
+  // optimized = minifyJS(optimized);
   
   // 5. Remove empty attributes
   optimized = removeEmptyAttributes(optimized);
@@ -109,20 +109,24 @@ function minifyJS(html: string): string {
     
     let minified = js;
     
-    // Remove single-line comments (but preserve URLs and regex patterns)
-    minified = minified.replace(/\/\/.*$/gm, '');
+    // Skip comment removal to avoid breaking URLs and strings
+    // The original code had issues with removing // from URLs like https://
+    // minified = minified.replace(/\/\/.*$/gm, '');
     
-    // Remove multi-line comments
+    // Remove multi-line comments (safer)
     minified = minified.replace(/\/\*[\s\S]*?\*\//g, '');
     
-    // Remove unnecessary whitespace
+    // Remove unnecessary whitespace - but be more careful with strings
     minified = minified.replace(/\s+/g, ' ');
     minified = minified.replace(/;\s+/g, ';');
     minified = minified.replace(/{\s+/g, '{');
     minified = minified.replace(/}\s+/g, '}');
     minified = minified.replace(/,\s+/g, ',');
-    minified = minified.replace(/\(\s+/g, '(');
-    minified = minified.replace(/\s+\)/g, ')');
+    
+    // Skip aggressive whitespace removal around parentheses to avoid breaking URLs
+    // This was causing issues with 'https://example.com' becoming 'https:
+    // minified = minified.replace(/\(\s+/g, '(');
+    // minified = minified.replace(/\s+\)/g, ')');
     
     // Remove unnecessary semicolons
     minified = minified.replace(/;}/g, '}');

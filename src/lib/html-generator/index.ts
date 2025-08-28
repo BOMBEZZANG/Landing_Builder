@@ -155,6 +155,8 @@ export class HTMLGenerator {
     if (ctaSection?.type === 'cta' && ctaSection.data.formEnabled) {
       const formHandler = generateFormHandler(ctaSection, this.options.formService);
       console.log('Form handler generated, length:', formHandler.length);
+      
+      
       scripts.push(formHandler);
     }
     

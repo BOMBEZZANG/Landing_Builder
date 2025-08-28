@@ -37,7 +37,7 @@ function generateFormspreeHandler(ctaSection: CTASection): string {
         // Disable button and show loading
         if (submitButton) {
           submitButton.disabled = true;
-          submitButton.innerHTML = "<span class=\\"spinner\\"></span> Sending...";
+          submitButton.innerHTML = '<span class="spinner"></span> Sending...';
         }
         
         // Hide any existing messages
@@ -158,7 +158,7 @@ function generateNetlifyHandler(ctaSection: CTASection): string {
         // Show loading state
         if (submitButton) {
           submitButton.disabled = true;
-          submitButton.innerHTML = "<span class=\\"spinner\\"></span> Sending...";
+          submitButton.innerHTML = '<span class="spinner"></span> Sending...';
         }
         
         // Netlify handles the submission automatically
@@ -257,7 +257,7 @@ function generateCustomHandler(ctaSection: CTASection): string {
         // Disable form and show loading state
         if (submitButton) {
           submitButton.disabled = true;
-          submitButton.innerHTML = "<span class=\\"spinner\\"></span> Sending...";
+          submitButton.innerHTML = '<span class="spinner"></span> Sending...';
         }
         
         // Hide any existing messages
