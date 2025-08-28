@@ -55,11 +55,32 @@ function generateFormspreeHandler(ctaSection: CTASection): string {
           });
           
           if (response.ok) {
-            // Success
-            if (message) {
-              message.className = 'form-message success';
-              message.textContent = 'Thank you! Your message has been sent successfully.';
-              message.style.display = 'block';
+            // Success - Show modal instead of text message
+            const modal = document.getElementById('success-modal');
+            if (modal) {
+              modal.style.display = 'flex';
+              
+              // Setup modal close handlers
+              const closeBtn = modal.querySelector('.modal-close');
+              const okBtn = modal.querySelector('.modal-ok-btn');
+              const overlay = modal.querySelector('.modal-overlay');
+              
+              const closeModal = () => {
+                modal.style.display = 'none';
+              };
+              
+              if (closeBtn) closeBtn.onclick = closeModal;
+              if (okBtn) okBtn.onclick = closeModal;
+              if (overlay) overlay.onclick = closeModal;
+              
+              // Close on Escape key
+              const handleEscape = (e) => {
+                if (e.key === 'Escape') {
+                  closeModal();
+                  document.removeEventListener('keydown', handleEscape);
+                }
+              };
+              document.addEventListener('keydown', handleEscape);
             }
             form.reset();
             
@@ -139,12 +160,33 @@ function generateNetlifyHandler(ctaSection: CTASection): string {
         }
         
         // Netlify handles the submission automatically
-        // Show success message after a brief delay
+        // Show success modal after a brief delay
         setTimeout(() => {
-          if (message) {
-            message.className = 'form-message success';
-            message.textContent = 'Thank you! Your message has been sent successfully.';
-            message.style.display = 'block';
+          const modal = document.getElementById('success-modal');
+          if (modal) {
+            modal.style.display = 'flex';
+            
+            // Setup modal close handlers
+            const closeBtn = modal.querySelector('.modal-close');
+            const okBtn = modal.querySelector('.modal-ok-btn');
+            const overlay = modal.querySelector('.modal-overlay');
+            
+            const closeModal = () => {
+              modal.style.display = 'none';
+            };
+            
+            if (closeBtn) closeBtn.onclick = closeModal;
+            if (okBtn) okBtn.onclick = closeModal;
+            if (overlay) overlay.onclick = closeModal;
+            
+            // Close on Escape key
+            const handleEscape = (e) => {
+              if (e.key === 'Escape') {
+                closeModal();
+                document.removeEventListener('keydown', handleEscape);
+              }
+            };
+            document.addEventListener('keydown', handleEscape);
           }
           
           // Track conversion
@@ -249,11 +291,32 @@ function generateCustomHandler(ctaSection: CTASection): string {
           const result = await response.json();
           
           if (response.ok && result.success) {
-            // Success
-            if (message) {
-              message.className = 'form-message success';
-              message.textContent = result.message || 'Thank you! Your message has been sent successfully.';
-              message.style.display = 'block';
+            // Success - Show modal instead of text message
+            const modal = document.getElementById('success-modal');
+            if (modal) {
+              modal.style.display = 'flex';
+              
+              // Setup modal close handlers
+              const closeBtn = modal.querySelector('.modal-close');
+              const okBtn = modal.querySelector('.modal-ok-btn');
+              const overlay = modal.querySelector('.modal-overlay');
+              
+              const closeModal = () => {
+                modal.style.display = 'none';
+              };
+              
+              if (closeBtn) closeBtn.onclick = closeModal;
+              if (okBtn) okBtn.onclick = closeModal;
+              if (overlay) overlay.onclick = closeModal;
+              
+              // Close on Escape key
+              const handleEscape = (e) => {
+                if (e.key === 'Escape') {
+                  closeModal();
+                  document.removeEventListener('keydown', handleEscape);
+                }
+              };
+              document.addEventListener('keydown', handleEscape);
             }
             form.reset();
             

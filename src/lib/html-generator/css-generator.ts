@@ -192,6 +192,115 @@ export function generateCSS(pageState: PageState, options: GeneratorOptions = {}
       border: 1px solid #f5c6cb;
     }
     
+    /* Success Modal Styles */
+    .success-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+    
+    .modal-content {
+      position: relative;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+      max-width: 400px;
+      width: 90%;
+      margin: 0 20px;
+      animation: modalSlideIn 0.3s ease-out;
+    }
+    
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 24px 0;
+    }
+    
+    .modal-header h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #16a34a;
+      margin: 0;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #6b7280;
+      padding: 4px;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    
+    .modal-close:hover {
+      color: #374151;
+    }
+    
+    .modal-body {
+      padding: 16px 24px 24px;
+    }
+    
+    .modal-body p {
+      margin: 0 0 12px;
+      color: #374151;
+      line-height: 1.5;
+    }
+    
+    .modal-body p:last-child {
+      margin-bottom: 0;
+    }
+    
+    .modal-footer {
+      padding: 0 24px 24px;
+      text-align: center;
+    }
+    
+    .modal-ok-btn {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .modal-ok-btn:hover {
+      background: color-mix(in srgb, var(--primary-color) 90%, black);
+      transform: translateY(-1px);
+    }
+    
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+    
     /* Button Styles */
     .btn {
       display: inline-flex;

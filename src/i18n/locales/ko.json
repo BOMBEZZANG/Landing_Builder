@@ -217,7 +217,7 @@
       "readyToPublish": "게시할 준비가 완료되었습니다!",
       "meetsAllRequirements": "랜딩 페이지가 모든 요구사항을 충족합니다.",
       "recommendations": "권장사항",
-      "whatHappensWhenPublish": "퍼블리쉬' 버튼을 누르면 랜딩 페이지가 생성 됩니다 한번 생성된 페이지는 수정이 불가하니 신중하게 작성해주세요 랜딩 페이지는 SEO 최적화로 만들어집니다",
+      "whatHappensWhenPublish": "'* 퍼블리쉬' 버튼을 누르면 랜딩 페이지가 생성 됩니다\n * 한번 생성된 페이지는 수정이 불가하니 신중하게 작성해주세요\n * 랜딩 페이지는 SEO 최적화로 만들어집니다",
       "emailSetupRequired": "이메일 설정 필요",
       "configureRecipientEmail": "폼 제출을 받으려면 CTA 섹션에서 수신자 이메일을 구성하세요.",
       "generationInProgress": "생성 진행 중...",

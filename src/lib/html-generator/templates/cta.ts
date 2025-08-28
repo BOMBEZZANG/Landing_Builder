@@ -33,15 +33,11 @@ export function generateCTAHTML(section: CTASection): string {
   }
   
   // Generate form or button
-  const apiUrl = 'https://easy-landing-omega.vercel.app';
   const actionHTML = data.formEnabled ? `
     <form id="contact-form" class="form-container" 
-          method="POST"
-          action="${apiUrl}/api/submit-form"
           data-form-handler="true"
           data-page-id="landing-page-${Date.now()}"
-          data-recipient-email="${escapeHTML(data.recipientEmail)}"
-          data-endpoint="${apiUrl}/api/submit-form">
+          data-recipient-email="${escapeHTML(data.recipientEmail)}">
       <!-- Hidden fields for form metadata -->
       <input type="hidden" name="recipientEmail" value="${escapeHTML(data.recipientEmail)}">
       <input type="hidden" name="pageId" value="landing-page-${Date.now()}">
@@ -51,6 +47,24 @@ export function generateCTAHTML(section: CTASection): string {
       </button>
       <div id="form-message" class="form-message" style="display: none;"></div>
     </form>
+    
+    <!-- Success Modal -->
+    <div id="success-modal" class="success-modal" style="display: none;">
+      <div class="modal-overlay"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>✅ Success!</h3>
+          <button class="modal-close" type="button">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>Thank you! Your message has been sent successfully.</p>
+          <p>We'll get back to you soon.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-ok-btn" type="button">OK</button>
+        </div>
+      </div>
+    </div>
   ` : `
     <a href="#" class="btn cta-button" style="background-color: ${data.buttonColor}; color: white;">
       ${escapeHTML(data.buttonText)}
