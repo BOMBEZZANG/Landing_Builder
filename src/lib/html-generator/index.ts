@@ -146,10 +146,16 @@ export class HTMLGenerator {
   private generateJavaScript(pageState: PageState): string {
     const scripts: string[] = [];
     
+    // Add basic debug script to verify JavaScript is executing
+    scripts.push(`console.log('🔧 Landing page JavaScript loaded successfully');`);
+    
     // Find CTA section with form
     const ctaSection = pageState.sections.find(s => s.type === 'cta');
+    console.log('Generating JavaScript - CTA section found:', !!ctaSection, 'Form enabled:', ctaSection?.type === 'cta' && ctaSection.data.formEnabled, 'Form service:', this.options.formService);
     if (ctaSection?.type === 'cta' && ctaSection.data.formEnabled) {
-      scripts.push(generateFormHandler(ctaSection, this.options.formService));
+      const formHandler = generateFormHandler(ctaSection, this.options.formService);
+      console.log('Form handler generated, length:', formHandler.length);
+      scripts.push(formHandler);
     }
     
     // Add smooth scroll behavior

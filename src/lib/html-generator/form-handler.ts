@@ -224,15 +224,19 @@ function generateCustomHandler(ctaSection: CTASection): string {
   // The generated HTML will use this URL to submit forms
   const apiUrl = 'https://easy-landing-omega.vercel.app';
   return `
+    // Debug: Script is executing
+    console.log('Form handler script loaded');
+    
     // Wait for DOM to be fully loaded
     document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM loaded, looking for contact form...');
       const form = document.getElementById('contact-form');
       if (!form) {
-        console.error('Contact form not found');
+        console.error('Contact form not found - checking all forms:', document.querySelectorAll('form'));
         return;
       }
       
-      console.log('Form handler initialized');
+      console.log('Form handler initialized successfully - Form found:', form);
       
       // Ensure form doesn't have action or method that could cause redirect
       form.removeAttribute('action');
@@ -241,10 +245,11 @@ function generateCustomHandler(ctaSection: CTASection): string {
       const message = document.getElementById('form-message');
       const recipientEmail = '${ctaSection.data.recipientEmail}';
       
+      console.log('Adding submit event listener to form');
       form.addEventListener('submit', async function(e) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('Form submission started - preventing default action');
+        console.log('🚀 FORM SUBMITTED! - Event intercepted successfully');
         
         const submitButton = form.querySelector('button[type="submit"]');
         const originalButtonText = submitButton ? submitButton.textContent : 'Submit';
@@ -299,9 +304,12 @@ function generateCustomHandler(ctaSection: CTASection): string {
           
           if (response.ok && result.success) {
             // Success - Show modal instead of text message
+            console.log('✅ Form submission successful, showing modal');
             const modal = document.getElementById('success-modal');
+            console.log('Modal element found:', modal);
             if (modal) {
               modal.style.display = 'flex';
+              console.log('Modal should now be visible');
               
               // Setup modal close handlers
               const closeBtn = modal.querySelector('.modal-close');
