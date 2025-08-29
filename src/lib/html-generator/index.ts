@@ -5,6 +5,7 @@ import { generateCTAHTML } from './templates/cta';
 import { generateCSS } from './css-generator';
 import { generateFormHandler } from './form-handler';
 import { optimizeHTML, validateOptimizedHTML } from './optimizer';
+import { generateFirebaseAnalyticsScript } from '@/lib/firebase';
 
 export interface GeneratorOptions {
   minify?: boolean;
@@ -92,8 +93,8 @@ export class HTMLGenerator {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     
-    <!-- Content Security Policy - Allow inline scripts, eval for deployment platforms, and external API calls -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://vercel.live; connect-src 'self' https://easy-landing-omega.vercel.app https://api.resend.com https://vercel.live wss://vercel.live https://vitals.vercel-insights.com; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
+    <!-- Content Security Policy - Allow inline scripts, eval for deployment platforms, Firebase, and external API calls -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com https://vercel.live; connect-src 'self' https://easy-landing-omega.vercel.app https://api.resend.com https://vercel.live wss://vercel.live https://vitals.vercel-insights.com https://firebaseinstallations.googleapis.com https://www.google-analytics.com https://analytics.google.com https://firebase.googleapis.com https://firebaselogging.googleapis.com; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
     
     <!-- SEO Meta Tags -->
     <title>${this.escapeHTML(pageState.title || 'Landing Page')}</title>
@@ -115,8 +116,11 @@ export class HTMLGenerator {
     <!-- Preconnect to external domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://res.cloudinary.com">
+    <link rel="preconnect" href="https://www.gstatic.com">
+    <link rel="preconnect" href="https://www.googletagmanager.com">
     
     <!-- STYLES_PLACEHOLDER -->
+    <!-- FIREBASE_ANALYTICS_PLACEHOLDER -->
 </head>
 <body>
     <!-- CONTENT_PLACEHOLDER -->
@@ -174,8 +178,12 @@ export class HTMLGenerator {
   }
   
   private combineHTML(base: string, sections: string, css: string, js: string): string {
+    // Generate Firebase Analytics script if analytics is enabled
+    const firebaseAnalytics = this.options.includeAnalytics ? generateFirebaseAnalyticsScript() : '';
+    
     return base
       .replace('<!-- STYLES_PLACEHOLDER -->', `<style>\n${css}\n</style>`)
+      .replace('<!-- FIREBASE_ANALYTICS_PLACEHOLDER -->', firebaseAnalytics)
       .replace('<!-- CONTENT_PLACEHOLDER -->', sections)
       .replace('<!-- SCRIPTS_PLACEHOLDER -->', js);
   }
