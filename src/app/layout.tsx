@@ -27,8 +27,45 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const GA4_ID = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
+  
   return (
     <html lang="en">
+      <head>
+        {/* Google Analytics 4 */}
+        {GA4_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics-4" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GA4_ID}', {
+                  page_path: window.location.pathname,
+                  debug_mode: ${process.env.NODE_ENV === 'development'}
+                });
+                
+                // Log initialization
+                console.log('GA4 initialized with ID:', '${GA4_ID}');
+                
+                // Track Web Vitals
+                if (typeof window !== 'undefined') {
+                  window.addEventListener('load', () => {
+                    gtag('event', 'page_view_complete', {
+                      event_category: 'Web Vitals',
+                      value: performance.now()
+                    });
+                  });
+                }
+              `}
+            </Script>
+          </>
+        )}
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

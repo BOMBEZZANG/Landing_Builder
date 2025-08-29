@@ -5,7 +5,7 @@ import { generateCTAHTML } from './templates/cta';
 import { generateCSS } from './css-generator';
 import { generateFormHandler } from './form-handler';
 import { optimizeHTML, validateOptimizedHTML } from './optimizer';
-import { generateFirebaseAnalyticsScript } from '@/lib/firebase';
+import { generateGA4Script } from '@/lib/ga4-analytics';
 import { generateAdSenseScript, generateAdSenseAutoAds } from '@/lib/adsense';
 
 export interface GeneratorOptions {
@@ -128,7 +128,7 @@ export class HTMLGenerator {
     <link rel="preconnect" href="https://tpc.googlesyndication.com">
     
     <!-- STYLES_PLACEHOLDER -->
-    <!-- FIREBASE_ANALYTICS_PLACEHOLDER -->
+    <!-- ANALYTICS_PLACEHOLDER -->
     <!-- ADSENSE_HEAD_PLACEHOLDER -->
 </head>
 <body>
@@ -188,8 +188,8 @@ export class HTMLGenerator {
   }
   
   private combineHTML(base: string, sections: string, css: string, js: string): string {
-    // Generate Firebase Analytics script if analytics is enabled
-    const firebaseAnalytics = this.options.includeAnalytics ? generateFirebaseAnalyticsScript() : '';
+    // Generate GA4 script if analytics is enabled
+    const analyticsScript = this.options.includeAnalytics ? generateGA4Script() : '';
     
     // Generate AdSense scripts if AdSense is enabled
     const adSenseHead = this.options.includeAdSense ? generateAdSenseScript() : '';
@@ -197,7 +197,7 @@ export class HTMLGenerator {
     
     return base
       .replace('<!-- STYLES_PLACEHOLDER -->', `<style>\n${css}\n</style>`)
-      .replace('<!-- FIREBASE_ANALYTICS_PLACEHOLDER -->', firebaseAnalytics)
+      .replace('<!-- ANALYTICS_PLACEHOLDER -->', analyticsScript)
       .replace('<!-- ADSENSE_HEAD_PLACEHOLDER -->', adSenseHead)
       .replace('<!-- CONTENT_PLACEHOLDER -->', sections)
       .replace('<!-- SCRIPTS_PLACEHOLDER -->', js)
@@ -249,27 +249,33 @@ export class HTMLGenerator {
   }
   
   private generateAnalytics(): string {
-    const gaId = process.env.NEXT_PUBLIC_GA_ID;
+    const gaId = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
     if (!gaId) return '';
     
     return `
-    // Google Analytics
-    (function() {
-      var script = document.createElement('script');
-      script.async = true;
-      script.src = 'https://www.googletagmanager.com/gtag/js?id=${gaId}';
-      document.head.appendChild(script);
-      
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', '${gaId}');
-      
-      // Track page view
-      gtag('event', 'page_view', {
-        page_title: document.title,
-        page_location: window.location.href
+    // Google Analytics 4 Events
+    if (typeof gtag !== 'undefined') {
+      // Track scroll depth
+      let scrollDepthTracked = false;
+      window.addEventListener('scroll', function() {
+        const scrollPercent = (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight;
+        if (scrollPercent > 0.75 && !scrollDepthTracked) {
+          gtag('event', 'scroll_depth', {
+            event_category: 'engagement',
+            event_label: '75%'
+          });
+          scrollDepthTracked = true;
+        }
       });
-    })();`;
+      
+      // Track time on page
+      setTimeout(function() {
+        gtag('event', 'time_on_page', {
+          event_category: 'engagement',
+          value: 30,
+          event_label: '30_seconds'
+        });
+      }, 30000);
+    }`;
   }
 }
