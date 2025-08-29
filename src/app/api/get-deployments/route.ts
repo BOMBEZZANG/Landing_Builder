@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { githubService } from '@/lib/github-service';
+import { createGitHubService } from '@/lib/github-service';
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
     console.log('Fetching deployments for userId:', userId);
     
     // Get list of deployed pages
+    const githubService = createGitHubService();
     const pages = await githubService.getPagesList(userId);
     
     const response = {

@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { githubService } from '@/lib/github-service';
+import { createGitHubService } from '@/lib/github-service';
 
 export async function GET(request: NextRequest) {
   try {
     console.log('Testing GitHub connection...');
     
     // Test GitHub connection
+    const githubService = createGitHubService();
     const connectionTest = await githubService.testConnection();
     console.log('Connection test result:', connectionTest);
     
@@ -77,6 +78,7 @@ export async function POST(request: NextRequest) {
     
     console.log('Testing deployment with test page...');
     
+    const githubService = createGitHubService();
     const deployResult = await githubService.deployPage(
       'test-user',
       'test-page-' + Date.now(),

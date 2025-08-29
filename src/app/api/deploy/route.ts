@@ -180,6 +180,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Delete page from GitHub
+    const githubService = createGitHubService();
     const success = await githubService.deletePage(userId, pageId);
 
     if (!success) {
