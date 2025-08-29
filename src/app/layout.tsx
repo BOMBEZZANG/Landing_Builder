@@ -32,35 +32,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* Google AdSense Script */}
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2598779635969436"
-          crossOrigin="anonymous"
-          strategy="beforeInteractive"
-        />
-        
         <I18nProvider>
           {children}
         </I18nProvider>
-        
-        {/* AdSense Auto Ads - Initialize Once */}
-        <Script
-          id="adsense-init"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              // Prevent duplicate initialization
-              if (typeof window !== 'undefined' && !window.adsenseInitialized) {
-                window.adsenseInitialized = true;
-                (adsbygoogle = window.adsbygoogle || []).push({
-                  google_ad_client: "ca-pub-2598779635969436",
-                  enable_page_level_ads: true
-                });
-              }
-            `
-          }}
-        />
       </body>
     </html>
   );
