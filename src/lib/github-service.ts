@@ -1,4 +1,5 @@
 import { Octokit } from '@octokit/rest';
+import { generateAdsTxtContent, shouldGenerateAdsTxt } from './ads-txt-generator';
 
 interface DeploymentConfig {
   owner: string;
@@ -74,7 +75,17 @@ export class GitHubService {
       await this.ensureRepositoryExists();
 
       // Get existing files to determine if this is an update
-      const existingFiles = await this.getExistingFiles([htmlPath, metadataPath]);
+      const filePaths = [htmlPath, metadataPath];
+      
+      // Add ads.txt to root if AdSense is configured
+      if (shouldGenerateAdsTxt()) {
+        filePaths.push('ads.txt');
+      }
+      
+      // Add robots.txt to root
+      filePaths.push('robots.txt');
+      
+      const existingFiles = await this.getExistingFiles(filePaths);
 
       // Prepare files to commit
       const filesToCommit: FileContent[] = [
@@ -95,6 +106,22 @@ export class GitHubService {
           sha: existingFiles.get(metadataPath)
         }
       ];
+
+      // Add ads.txt if AdSense is configured
+      if (shouldGenerateAdsTxt()) {
+        filesToCommit.push({
+          path: 'ads.txt',
+          content: generateAdsTxtContent(),
+          sha: existingFiles.get('ads.txt')
+        });
+      }
+
+      // Add robots.txt
+      filesToCommit.push({
+        path: 'robots.txt',
+        content: this.generateRobotsTxt(),
+        sha: existingFiles.get('robots.txt')
+      });
 
       // Create commit message
       const isUpdate = existingFiles.has(htmlPath);
@@ -400,6 +427,22 @@ export class GitHubService {
     return id.replace(/[^a-zA-Z0-9-_]/g, '-').toLowerCase();
   }
 
+  private generateRobotsTxt(): string {
+    return `User-agent: *
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Mediapartners-Google
+Allow: /
+
+User-agent: AdsBot-Google
+Allow: /
+
+Sitemap: https://kanomsoft.com/sitemap.xml`;
+  }
+
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
@@ -432,5 +475,10 @@ export class GitHubService {
   }
 }
 
-// Export singleton instance
-export const githubService = new GitHubService();
+// Export singleton instance factory
+export const createGitHubService = () => {
+  if (!process.env.GITHUB_TOKEN) {
+    throw new Error('GitHub token is required. Please check your .env.local file.');
+  }
+  return new GitHubService();
+};

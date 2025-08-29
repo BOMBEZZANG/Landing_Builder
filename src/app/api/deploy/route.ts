@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { HTMLGenerator } from '@/lib/html-generator/index';
-import { githubService } from '@/lib/github-service';
+import { createGitHubService } from '@/lib/github-service';
 import { PageState } from '@/types/builder.types';
 
 interface DeployRequest {
@@ -83,6 +83,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Step 2: Deploy to GitHub
+    const githubService = createGitHubService();
     const deployResult = await githubService.deployPage(
       body.userId,
       pageId,
@@ -141,6 +142,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get list of deployed pages for user
+    const githubService = createGitHubService();
     const pages = await githubService.getPagesList(userId);
 
     return NextResponse.json({
