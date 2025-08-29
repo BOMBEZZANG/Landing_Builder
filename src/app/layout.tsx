@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import { I18nProvider } from "@/components/i18n/I18nProvider";
 import "./globals.css";
 
@@ -26,14 +27,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Google AdSense Meta Tag for Verification */}
-        <meta name="google-adsense-account" content="ca-pub-2598779635969436" />
+        {/* Google AdSense Verification Meta Tags */}
+        <meta name="google-adsense-platform-account" content="ca-pub-2598779635969436" />
+        <meta name="google-adsense-platform-domain" content="kanomsoft.com" />
         
         {/* Google AdSense Script */}
-        <script 
-          async 
+        <Script
+          async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2598779635969436"
           crossOrigin="anonymous"
+          strategy="afterInteractive"
         />
       </head>
       <body
@@ -44,7 +47,9 @@ export default function RootLayout({
         </I18nProvider>
         
         {/* AdSense Auto Ads */}
-        <script
+        <Script
+          id="adsense-init"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               (adsbygoogle = window.adsbygoogle || []).push({
