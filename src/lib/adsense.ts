@@ -13,9 +13,11 @@ export function generateAdSenseScript(): string {
   }
   
   return `
-    <!-- Google AdSense -->
+    <!-- Google AdSense - Enhanced for Verification -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${config.clientId}"
-            crossorigin="anonymous"></script>`;
+            crossorigin="anonymous"
+            data-ad-client="${config.clientId}"
+            data-checked-head="true"></script>`;
 }
 
 export function generateAdSenseAutoAds(): string {
@@ -26,12 +28,17 @@ export function generateAdSenseAutoAds(): string {
   }
   
   return `
-    <!-- AdSense Auto Ads -->
+    <!-- AdSense Auto Ads - Enhanced Configuration -->
     <script>
       (adsbygoogle = window.adsbygoogle || []).push({
         google_ad_client: "${config.clientId}",
-        enable_page_level_ads: true
+        enable_page_level_ads: true,
+        overlays: {bottom: true},
+        auto_ad_client: "${config.clientId}"
       });
+      
+      // AdSense verification helper
+      window.adsbygoogle = window.adsbygoogle || [];
     </script>`;
 }
 

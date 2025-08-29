@@ -102,6 +102,7 @@ export class HTMLGenerator {
     <!-- SEO Meta Tags -->
     <title>${this.escapeHTML(pageState.title || 'Landing Page')}</title>
     <meta name="description" content="${this.escapeHTML(pageState.metadata?.description || '')}">
+    ${this.options.includeAdSense ? `<meta name="google-adsense-account" content="${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || ''}">` : ''}
     
     <!-- Open Graph -->
     <meta property="og:title" content="${this.escapeHTML(pageState.title || '')}">
