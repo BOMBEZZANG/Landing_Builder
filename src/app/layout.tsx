@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Landing Page Builder",
   description: "Create beautiful landing pages with drag and drop",
+  other: {
+    'google-adsense-account': 'ca-pub-2598779635969436',
+  },
 };
 
 export default function RootLayout({
@@ -26,22 +29,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        {/* Google AdSense Verification Meta Tags */}
-        <meta name="google-adsense-platform-account" content="ca-pub-2598779635969436" />
-        <meta name="google-adsense-platform-domain" content="kanomsoft.com" />
-        
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         {/* Google AdSense Script */}
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2598779635969436"
           crossOrigin="anonymous"
-          strategy="afterInteractive"
+          strategy="beforeInteractive"
         />
-      </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+        
         <I18nProvider>
           {children}
         </I18nProvider>
