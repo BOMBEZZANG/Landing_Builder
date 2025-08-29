@@ -44,16 +44,20 @@ export default function RootLayout({
           {children}
         </I18nProvider>
         
-        {/* AdSense Auto Ads */}
+        {/* AdSense Auto Ads - Initialize Once */}
         <Script
           id="adsense-init"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
-              (adsbygoogle = window.adsbygoogle || []).push({
-                google_ad_client: "ca-pub-2598779635969436",
-                enable_page_level_ads: true
-              });
+              // Prevent duplicate initialization
+              if (typeof window !== 'undefined' && !window.adsenseInitialized) {
+                window.adsenseInitialized = true;
+                (adsbygoogle = window.adsbygoogle || []).push({
+                  google_ad_client: "ca-pub-2598779635969436",
+                  enable_page_level_ads: true
+                });
+              }
             `
           }}
         />

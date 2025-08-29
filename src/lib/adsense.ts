@@ -28,17 +28,16 @@ export function generateAdSenseAutoAds(): string {
   }
   
   return `
-    <!-- AdSense Auto Ads - Enhanced Configuration -->
+    <!-- AdSense Auto Ads -->
     <script>
-      (adsbygoogle = window.adsbygoogle || []).push({
-        google_ad_client: "${config.clientId}",
-        enable_page_level_ads: true,
-        overlays: {bottom: true},
-        auto_ad_client: "${config.clientId}"
-      });
-      
-      // AdSense verification helper
-      window.adsbygoogle = window.adsbygoogle || [];
+      // Prevent duplicate initialization in generated HTML
+      if (!window.adsenseInitialized) {
+        window.adsenseInitialized = true;
+        (adsbygoogle = window.adsbygoogle || []).push({
+          google_ad_client: "${config.clientId}",
+          enable_page_level_ads: true
+        });
+      }
     </script>`;
 }
 
