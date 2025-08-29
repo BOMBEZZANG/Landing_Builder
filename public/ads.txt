@@ -1,0 +1,3 @@
+# ads.txt file for kanomsoft.com
+# Google AdSense
+google.com, pub-2598779635969436, DIRECT, f08c47fec0942fa0
