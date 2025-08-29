@@ -42,10 +42,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Default options
+    // Enable analytics if either Firebase or Google Analytics is configured
+    const hasFirebaseConfig = !!(process.env.NEXT_PUBLIC_FIREBASE_API_KEY && process.env.NEXT_PUBLIC_FIREBASE_APP_ID);
+    const hasGoogleAnalytics = !!process.env.NEXT_PUBLIC_GA_ID;
+    
     const defaultOptions = {
       minify: true,
       inlineCSS: true,
-      includeAnalytics: false,
+      includeAnalytics: hasFirebaseConfig || hasGoogleAnalytics,
       includeMeta: true,
       includeAnimations: true,
       optimizeImages: true,

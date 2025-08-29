@@ -111,13 +111,13 @@ export default function BuilderClient() {
           userId: safeSettings.userId || 'user-' + Date.now(),
           pageId: safeSettings.pageId || generatePageId(page.title),
           options: {
-            minify: safeSettings.optimizations?.minify || true,
+            minify: safeSettings.optimizations?.minify !== false ? true : false,
             inlineCSS: true,
-            includeAnalytics: safeSettings.enableAnalytics || false,
+            includeAnalytics: safeSettings.enableAnalytics !== false ? true : false,
             includeMeta: true,
-            includeAnimations: safeSettings.optimizations?.includeAnimations || true,
-            optimizeImages: safeSettings.optimizations?.optimizeImages || true,
-            formService: safeSettings.formService || 'formspree'
+            includeAnimations: safeSettings.optimizations?.includeAnimations !== false ? true : false,
+            optimizeImages: safeSettings.optimizations?.optimizeImages !== false ? true : false,
+            formService: safeSettings.formService || 'custom'
           }
         }),
       });
