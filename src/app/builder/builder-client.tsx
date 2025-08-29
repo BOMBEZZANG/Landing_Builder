@@ -91,6 +91,7 @@ export default function BuilderClient() {
     const safeSettings = settings || {
       userId: 'user-' + Date.now(),
       enableAnalytics: false,
+      enableAdSense: false,
       formService: 'formspree' as const,
       optimizations: {
         minify: true,
@@ -114,6 +115,7 @@ export default function BuilderClient() {
             minify: safeSettings.optimizations?.minify !== false ? true : false,
             inlineCSS: true,
             includeAnalytics: safeSettings.enableAnalytics !== false ? true : false,
+            includeAdSense: safeSettings.enableAdSense !== false ? true : false,
             includeMeta: true,
             includeAnimations: safeSettings.optimizations?.includeAnimations !== false ? true : false,
             optimizeImages: safeSettings.optimizations?.optimizeImages !== false ? true : false,

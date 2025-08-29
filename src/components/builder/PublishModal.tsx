@@ -20,6 +20,7 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
   const [publishSettings, setPublishSettings] = useState<PublishSettings>({
     userId: 'user-' + Date.now(),
     enableAnalytics: true,
+    enableAdSense: true,
     formService: 'custom', // Use custom API for better control
     optimizations: {
       minify: true,
@@ -59,7 +60,8 @@ export function PublishModal({ isOpen, onClose, page, onPublish }: PublishModalP
         optimizeImages: true,
         includeAnimations: true
       },
-      enableAnalytics: true
+      enableAnalytics: true,
+      enableAdSense: true
     };
     
     try {

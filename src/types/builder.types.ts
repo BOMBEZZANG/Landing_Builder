@@ -183,6 +183,7 @@ export interface GeneratorOptions {
   minify?: boolean;
   inlineCSS?: boolean;
   includeAnalytics?: boolean;
+  includeAdSense?: boolean;
   formService?: 'formspree' | 'custom' | 'netlify-forms';
   includeAnimations?: boolean;
   optimizeImages?: boolean;
@@ -245,6 +246,7 @@ export interface PublishSettings {
   pageId?: string;
   customDomain?: string;
   enableAnalytics: boolean;
+  enableAdSense?: boolean;
   formService: 'formspree' | 'custom' | 'netlify-forms';
   optimizations: {
     minify: boolean;

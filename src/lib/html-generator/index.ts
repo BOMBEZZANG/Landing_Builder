@@ -6,11 +6,13 @@ import { generateCSS } from './css-generator';
 import { generateFormHandler } from './form-handler';
 import { optimizeHTML, validateOptimizedHTML } from './optimizer';
 import { generateFirebaseAnalyticsScript } from '@/lib/firebase';
+import { generateAdSenseScript, generateAdSenseAutoAds } from '@/lib/adsense';
 
 export interface GeneratorOptions {
   minify?: boolean;
   inlineCSS?: boolean;
   includeAnalytics?: boolean;
+  includeAdSense?: boolean;
   formService?: 'formspree' | 'custom' | 'netlify-forms';
   includeAnimations?: boolean;
 }
@@ -34,6 +36,7 @@ export class HTMLGenerator {
       minify: true,
       inlineCSS: true,
       includeAnalytics: false,
+      includeAdSense: false,
       formService: 'custom', // Changed to use our custom API
       includeAnimations: true,
       ...options
@@ -93,8 +96,8 @@ export class HTMLGenerator {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     
-    <!-- Content Security Policy - Allow inline scripts, eval for deployment platforms, Firebase, and external API calls -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com https://vercel.live; connect-src 'self' https://easy-landing-omega.vercel.app https://api.resend.com https://vercel.live wss://vercel.live https://vitals.vercel-insights.com https://firebaseinstallations.googleapis.com https://www.google-analytics.com https://analytics.google.com https://firebase.googleapis.com https://firebaselogging.googleapis.com; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
+    <!-- Content Security Policy - Allow inline scripts, eval for deployment platforms, Firebase, AdSense, and external API calls -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com https://vercel.live https://pagead2.googlesyndication.com https://tpc.googlesyndication.com https://www.googleadservices.com; connect-src 'self' https://easy-landing-omega.vercel.app https://api.resend.com https://vercel.live wss://vercel.live https://vitals.vercel-insights.com https://firebaseinstallations.googleapis.com https://www.google-analytics.com https://analytics.google.com https://firebase.googleapis.com https://firebaselogging.googleapis.com https://www.googleadservices.com https://googleads.g.doubleclick.net; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com;">
     
     <!-- SEO Meta Tags -->
     <title>${this.escapeHTML(pageState.title || 'Landing Page')}</title>
@@ -118,13 +121,17 @@ export class HTMLGenerator {
     <link rel="preconnect" href="https://res.cloudinary.com">
     <link rel="preconnect" href="https://www.gstatic.com">
     <link rel="preconnect" href="https://www.googletagmanager.com">
+    <link rel="preconnect" href="https://pagead2.googlesyndication.com">
+    <link rel="preconnect" href="https://tpc.googlesyndication.com">
     
     <!-- STYLES_PLACEHOLDER -->
     <!-- FIREBASE_ANALYTICS_PLACEHOLDER -->
+    <!-- ADSENSE_HEAD_PLACEHOLDER -->
 </head>
 <body>
     <!-- CONTENT_PLACEHOLDER -->
     <!-- SCRIPTS_PLACEHOLDER -->
+    <!-- ADSENSE_BODY_PLACEHOLDER -->
 </body>
 </html>`;
   }
@@ -181,11 +188,17 @@ export class HTMLGenerator {
     // Generate Firebase Analytics script if analytics is enabled
     const firebaseAnalytics = this.options.includeAnalytics ? generateFirebaseAnalyticsScript() : '';
     
+    // Generate AdSense scripts if AdSense is enabled
+    const adSenseHead = this.options.includeAdSense ? generateAdSenseScript() : '';
+    const adSenseBody = this.options.includeAdSense ? generateAdSenseAutoAds() : '';
+    
     return base
       .replace('<!-- STYLES_PLACEHOLDER -->', `<style>\n${css}\n</style>`)
       .replace('<!-- FIREBASE_ANALYTICS_PLACEHOLDER -->', firebaseAnalytics)
+      .replace('<!-- ADSENSE_HEAD_PLACEHOLDER -->', adSenseHead)
       .replace('<!-- CONTENT_PLACEHOLDER -->', sections)
-      .replace('<!-- SCRIPTS_PLACEHOLDER -->', js);
+      .replace('<!-- SCRIPTS_PLACEHOLDER -->', js)
+      .replace('<!-- ADSENSE_BODY_PLACEHOLDER -->', adSenseBody);
   }
   
   private escapeHTML(str: string): string {
