@@ -3,6 +3,8 @@ import { Section } from '@/types/builder.types';
 import { cn } from '@/lib/utils';
 import HeroSection from '@/components/sections/HeroSection';
 import ContentSection from '@/components/sections/ContentSection';
+import { ContentTextSection } from '@/components/sections/ContentTextSection';
+import { ContentImageSection } from '@/components/sections/ContentImageSection';
 import CTASection from '@/components/sections/CTASection';
 
 interface CanvasProps {
@@ -41,7 +43,13 @@ export default function Canvas({
         {/* Selection indicator */}
         {isSelected && !isPreviewMode && (
           <div className="absolute top-2 left-2 z-20 bg-builder-selected text-white px-2 py-1 rounded text-xs font-semibold">
-            {section.type.charAt(0).toUpperCase() + section.type.slice(1)} Section
+            {(() => {
+              switch(section.type) {
+                case 'content-text': return 'Text Content';
+                case 'content-image': return 'Image Content';
+                default: return section.type.charAt(0).toUpperCase() + section.type.slice(1);
+              }
+            })()} Section
           </div>
         )}
         
@@ -75,6 +83,28 @@ export default function Canvas({
           <SectionWrapper key={section.id}>
             <ContentSection
               section={section}
+              isEditing={!isPreviewMode && isSelected}
+              onUpdate={handleUpdate}
+            />
+          </SectionWrapper>
+        );
+      
+      case 'content-text':
+        return (
+          <SectionWrapper key={section.id}>
+            <ContentTextSection
+              section={section as any}
+              isEditing={!isPreviewMode && isSelected}
+              onUpdate={handleUpdate}
+            />
+          </SectionWrapper>
+        );
+      
+      case 'content-image':
+        return (
+          <SectionWrapper key={section.id}>
+            <ContentImageSection
+              section={section as any}
               isEditing={!isPreviewMode && isSelected}
               onUpdate={handleUpdate}
             />

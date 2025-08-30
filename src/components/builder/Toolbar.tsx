@@ -6,6 +6,7 @@ import Button from '@/components/ui/Button';
 import { PublishModal } from '@/components/builder/PublishModal';
 import LanguageSwitcher from '@/components/i18n/LanguageSwitcher';
 import { useTranslation } from '@/components/i18n/I18nProvider';
+import { AddSectionButton } from '@/components/builder/AddSectionButton';
 
 interface ToolbarProps {
   onSave: () => void;
@@ -219,6 +220,11 @@ export default function Toolbar({
               </svg>
             </Button>
           </div>
+        )}
+        
+        {/* Add Section Button */}
+        {!isPreviewMode && (
+          <AddSectionButton />
         )}
         
         {/* Template Actions */}

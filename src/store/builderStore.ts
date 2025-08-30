@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { Section, PageState, BuilderState, DeviceType } from '@/types/builder.types';
+import { Section, PageState, BuilderState, DeviceType, TextContentSection, ImageContentSection } from '@/types/builder.types';
+import { migrateSections, needsMigration } from '@/utils/migration';
 
 interface HistoryState {
   past: PageState[];
@@ -12,6 +13,10 @@ interface BuilderStore extends BuilderState {
   history: HistoryState;
   canUndo: boolean;
   canRedo: boolean;
+  
+  // New computed properties
+  contentSectionsCount: number;
+  canAddMoreSections: boolean;
   
   // Actions
   initializePage: () => void;
@@ -29,6 +34,13 @@ interface BuilderStore extends BuilderState {
   saveToLocalStorage: () => void;
   loadFromLocalStorage: () => void;
   resetPage: () => void;
+  
+  // New actions for dynamic content sections
+  addContentSection: (type: 'content-text' | 'content-image') => void;
+  deleteSection: (sectionId: string) => void;
+  duplicateSection: (sectionId: string) => void;
+  convertSectionType: (sectionId: string, newType: 'content-text' | 'content-image') => void;
+  canDeleteSection: (sectionId: string) => boolean;
 }
 
 const defaultSections: Section[] = [
@@ -125,6 +137,51 @@ const limitHistory = (history: PageState[]): PageState[] => {
   return history;
 };
 
+// Helper function to generate unique ID
+const generateSectionId = (type: string) => {
+  return `${type}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+};
+
+// Helper function to create new content sections
+const createContentSection = (type: 'content-text' | 'content-image', order: number): TextContentSection | ImageContentSection => {
+  const baseData = {
+    title: 'New Content Section',
+    content: 'Add your content here. Click to edit this text and make it your own.',
+    backgroundColor: '#ffffff',
+    textColor: '#1f2937',
+    padding: 'medium' as const
+  };
+
+  if (type === 'content-text') {
+    return {
+      id: generateSectionId('content-text'),
+      type: 'content-text',
+      order,
+      data: {
+        ...baseData,
+        backgroundType: 'color',
+        textAlignment: 'left'
+      }
+    } as TextContentSection;
+  } else {
+    return {
+      id: generateSectionId('content-image'),
+      type: 'content-image',
+      order,
+      data: {
+        ...baseData,
+        imageUrl: '',
+        imagePosition: 'right',
+        imageSize: 'medium'
+      }
+    } as ImageContentSection;
+  }
+};
+
+// Constants for section limits
+const MAX_CONTENT_SECTIONS = 10;
+const MAX_IMAGE_SECTIONS = 5;
+
 export const useBuilderStore = create<BuilderStore>((set, get) => {
   const defaultPage = createDefaultPage();
   
@@ -139,13 +196,40 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
     history: createInitialHistory(defaultPage),
     canUndo: false,
     canRedo: false,
+    
+    // Computed properties
+    get contentSectionsCount() {
+      const state = get();
+      return state.page.sections.filter(s => 
+        s.type === 'content' || s.type === 'content-text' || s.type === 'content-image'
+      ).length;
+    },
+    
+    get canAddMoreSections() {
+      const state = get();
+      const contentCount = state.contentSectionsCount;
+      const imageCount = state.page.sections.filter(s => s.type === 'content-image').length;
+      return contentCount < MAX_CONTENT_SECTIONS && imageCount < MAX_IMAGE_SECTIONS;
+    },
 
     // Actions implementation
     initializePage: () => {
       try {
         const saved = localStorage.getItem('builder-draft');
         if (saved) {
-          const parsed = JSON.parse(saved);
+          let parsed = JSON.parse(saved);
+          
+          // Check if migration is needed
+          if (parsed.sections && needsMigration(parsed.sections)) {
+            parsed = {
+              ...parsed,
+              sections: migrateSections(parsed.sections)
+            };
+            // Save migrated version
+            localStorage.setItem('builder-draft', JSON.stringify(parsed));
+            console.log('Migrated saved page to new section format');
+          }
+          
           set((state) => ({
             page: parsed,
             history: createInitialHistory(parsed),
@@ -384,7 +468,19 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
       try {
         const saved = localStorage.getItem('builder-draft');
         if (saved) {
-          const parsed = JSON.parse(saved);
+          let parsed = JSON.parse(saved);
+          
+          // Check if migration is needed
+          if (parsed.sections && needsMigration(parsed.sections)) {
+            parsed = {
+              ...parsed,
+              sections: migrateSections(parsed.sections)
+            };
+            // Save migrated version
+            localStorage.setItem('builder-draft', JSON.stringify(parsed));
+            console.log('Migrated saved page to new section format');
+          }
+          
           set((state) => ({
             page: parsed,
             history: createInitialHistory(parsed),
@@ -409,6 +505,230 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
         isPreviewMode: false,
         hasUnsavedChanges: false
       });
+    },
+    
+    // New action implementations
+    addContentSection: (type) => {
+      const state = get();
+      
+      // Check limits
+      if (!state.canAddMoreSections) {
+        console.warn('Cannot add more sections: limit reached');
+        return;
+      }
+      
+      if (type === 'content-image') {
+        const imageCount = state.page.sections.filter(s => s.type === 'content-image').length;
+        if (imageCount >= MAX_IMAGE_SECTIONS) {
+          console.warn('Cannot add more image sections: limit reached');
+          return;
+        }
+      }
+      
+      // Save to history before making changes
+      get().saveToHistory();
+      
+      set((state) => {
+        const sections = [...state.page.sections];
+        // Find the position to insert (before CTA section)
+        const ctaIndex = sections.findIndex(s => s.type === 'cta');
+        const insertIndex = ctaIndex !== -1 ? ctaIndex : sections.length;
+        
+        // Create new section with proper order
+        const newSection = createContentSection(type, insertIndex);
+        
+        // Insert the new section and update orders
+        sections.splice(insertIndex, 0, newSection);
+        sections.forEach((section, index) => {
+          section.order = index;
+        });
+        
+        const newPage = {
+          ...state.page,
+          sections
+        };
+        
+        const newHistory: HistoryState = {
+          ...state.history,
+          present: clonePage(newPage)
+        };
+        
+        return {
+          page: newPage,
+          history: newHistory,
+          hasUnsavedChanges: true,
+          selectedSectionId: newSection.id
+        };
+      });
+    },
+    
+    deleteSection: (sectionId) => {
+      const state = get();
+      const section = state.page.sections.find(s => s.id === sectionId);
+      
+      // Prevent deletion of hero and CTA sections
+      if (!section || section.type === 'hero' || section.type === 'cta') {
+        console.warn('Cannot delete this section');
+        return;
+      }
+      
+      // Save to history before making changes
+      get().saveToHistory();
+      
+      set((state) => {
+        const sections = state.page.sections
+          .filter(s => s.id !== sectionId)
+          .map((section, index) => ({ ...section, order: index }));
+        
+        const newPage = {
+          ...state.page,
+          sections
+        };
+        
+        const newHistory: HistoryState = {
+          ...state.history,
+          present: clonePage(newPage)
+        };
+        
+        return {
+          page: newPage,
+          history: newHistory,
+          hasUnsavedChanges: true,
+          selectedSectionId: null
+        };
+      });
+    },
+    
+    duplicateSection: (sectionId) => {
+      const state = get();
+      const section = state.page.sections.find(s => s.id === sectionId);
+      
+      if (!section || section.type === 'hero' || section.type === 'cta') {
+        console.warn('Cannot duplicate this section');
+        return;
+      }
+      
+      // Check limits
+      if (!state.canAddMoreSections) {
+        console.warn('Cannot add more sections: limit reached');
+        return;
+      }
+      
+      // Save to history before making changes
+      get().saveToHistory();
+      
+      set((state) => {
+        const sections = [...state.page.sections];
+        const originalIndex = sections.findIndex(s => s.id === sectionId);
+        
+        if (originalIndex === -1) return state;
+        
+        // Create a duplicate with new ID
+        const duplicatedSection = {
+          ...clonePage(sections[originalIndex]),
+          id: generateSectionId(sections[originalIndex].type),
+          order: originalIndex + 1
+        };
+        
+        // Insert after the original section
+        sections.splice(originalIndex + 1, 0, duplicatedSection);
+        
+        // Update orders
+        sections.forEach((section, index) => {
+          section.order = index;
+        });
+        
+        const newPage = {
+          ...state.page,
+          sections
+        };
+        
+        const newHistory: HistoryState = {
+          ...state.history,
+          present: clonePage(newPage)
+        };
+        
+        return {
+          page: newPage,
+          history: newHistory,
+          hasUnsavedChanges: true,
+          selectedSectionId: duplicatedSection.id
+        };
+      });
+    },
+    
+    convertSectionType: (sectionId, newType) => {
+      const state = get();
+      const section = state.page.sections.find(s => s.id === sectionId);
+      
+      if (!section || (section.type !== 'content-text' && section.type !== 'content-image')) {
+        console.warn('Cannot convert this section type');
+        return;
+      }
+      
+      // Save to history before making changes
+      get().saveToHistory();
+      
+      set((state) => {
+        const sections = state.page.sections.map(s => {
+          if (s.id === sectionId) {
+            const baseData = {
+              title: (s.data as any).title || 'Content Section',
+              content: (s.data as any).content || '',
+              backgroundColor: (s.data as any).backgroundColor || '#ffffff',
+              textColor: (s.data as any).textColor || '#1f2937',
+              padding: (s.data as any).padding || 'medium'
+            };
+            
+            if (newType === 'content-text') {
+              return {
+                ...s,
+                type: 'content-text',
+                data: {
+                  ...baseData,
+                  backgroundType: 'color',
+                  textAlignment: 'left'
+                }
+              } as TextContentSection;
+            } else {
+              return {
+                ...s,
+                type: 'content-image',
+                data: {
+                  ...baseData,
+                  imageUrl: (s.data as any).imageUrl || '',
+                  imagePublicId: (s.data as any).imagePublicId,
+                  imagePosition: (s.data as any).imagePosition || 'right',
+                  imageSize: 'medium'
+                }
+              } as ImageContentSection;
+            }
+          }
+          return s;
+        });
+        
+        const newPage = {
+          ...state.page,
+          sections
+        };
+        
+        const newHistory: HistoryState = {
+          ...state.history,
+          present: clonePage(newPage)
+        };
+        
+        return {
+          page: newPage,
+          history: newHistory,
+          hasUnsavedChanges: true
+        };
+      });
+    },
+    
+    canDeleteSection: (sectionId) => {
+      const state = get();
+      const section = state.page.sections.find(s => s.id === sectionId);
+      return section ? section.type !== 'hero' && section.type !== 'cta' : false;
     }
   };
 });

@@ -107,6 +107,140 @@ export default function PropertyPanel({
     </>
   );
 
+  const renderContentTextProperties = (section: Extract<Section, { type: 'content-text' }>) => (
+    <>
+      <PropertyGroup title="Background">
+        <Select
+          label="Background Type"
+          value={section.data.backgroundType}
+          onChange={(e) => onUpdateSection({ backgroundType: e.target.value as any })}
+          options={[
+            { value: 'color', label: 'Solid Color' },
+            { value: 'gradient', label: 'Gradient' }
+          ]}
+        />
+        
+        <ColorPicker
+          label="Background Color"
+          color={section.data.backgroundColor}
+          onChange={(color) => onUpdateSection({ backgroundColor: color })}
+        />
+        
+        {section.data.backgroundType === 'gradient' && (
+          <Input
+            label="Gradient CSS"
+            value={section.data.backgroundGradient || ''}
+            onChange={(e) => onUpdateSection({ backgroundGradient: e.target.value })}
+            placeholder="linear-gradient(...)"
+          />
+        )}
+      </PropertyGroup>
+
+      <PropertyGroup title="Text">
+        <ColorPicker
+          label="Text Color"
+          color={section.data.textColor}
+          onChange={(color) => onUpdateSection({ textColor: color })}
+        />
+        
+        <Select
+          label="Text Alignment"
+          value={section.data.textAlignment}
+          onChange={(e) => onUpdateSection({ textAlignment: e.target.value as any })}
+          options={[
+            { value: 'left', label: 'Left' },
+            { value: 'center', label: 'Center' },
+            { value: 'right', label: 'Right' }
+          ]}
+        />
+      </PropertyGroup>
+
+      <PropertyGroup title="Layout">
+        <Select
+          label="Section Padding"
+          value={section.data.padding}
+          onChange={(e) => onUpdateSection({ padding: e.target.value as any })}
+          options={PADDING_OPTIONS.map(p => ({ value: p.value, label: p.name }))}
+        />
+      </PropertyGroup>
+    </>
+  );
+
+  const renderContentImageProperties = (section: Extract<Section, { type: 'content-image' }>) => (
+    <>
+      <PropertyGroup title="Background">
+        <ColorPicker
+          label="Background Color"
+          color={section.data.backgroundColor}
+          onChange={(color) => onUpdateSection({ backgroundColor: color })}
+        />
+      </PropertyGroup>
+
+      <PropertyGroup title="Text">
+        <ColorPicker
+          label="Text Color"
+          color={section.data.textColor}
+          onChange={(color) => onUpdateSection({ textColor: color })}
+        />
+      </PropertyGroup>
+
+      <PropertyGroup title="Image">
+        <Select
+          label="Image Position"
+          value={section.data.imagePosition}
+          onChange={(e) => onUpdateSection({ imagePosition: e.target.value as any })}
+          options={[
+            { value: 'left', label: 'Left' },
+            { value: 'right', label: 'Right' },
+            { value: 'top', label: 'Top' },
+            { value: 'bottom', label: 'Bottom' }
+          ]}
+        />
+        
+        <Select
+          label="Image Size"
+          value={section.data.imageSize}
+          onChange={(e) => onUpdateSection({ imageSize: e.target.value as any })}
+          options={[
+            { value: 'small', label: 'Small' },
+            { value: 'medium', label: 'Medium' },
+            { value: 'large', label: 'Large' }
+          ]}
+        />
+        
+        {section.data.imageUrl && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Current Image
+            </label>
+            <img
+              src={section.data.imageUrl}
+              alt="Section"
+              className="w-full h-20 object-cover rounded border"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-2 w-full"
+              onClick={() => onUpdateSection({ imageUrl: '' })}
+            >
+              Remove Image
+            </Button>
+          </div>
+        )}
+      </PropertyGroup>
+
+      <PropertyGroup title="Layout">
+        <Select
+          label="Section Padding"
+          value={section.data.padding}
+          onChange={(e) => onUpdateSection({ padding: e.target.value as any })}
+          options={PADDING_OPTIONS.map(p => ({ value: p.value, label: p.name }))}
+        />
+      </PropertyGroup>
+    </>
+  );
+
   const renderContentProperties = (section: Extract<Section, { type: 'content' }>) => (
     <>
       <PropertyGroup title="Background">
@@ -321,13 +455,24 @@ export default function PropertyPanel({
         <div className="flex items-center space-x-2">
           <div className="w-2 h-2 bg-builder-selected rounded-full"></div>
           <span className="text-sm font-medium text-gray-700">
-            {selectedSection.type === 'hero' ? t('builder.sections.hero') : selectedSection.type === 'content' ? t('builder.sections.content') : selectedSection.type === 'cta' ? t('builder.sections.ctaSection') : 'Section'}
+            {(() => {
+              switch(selectedSection.type) {
+                case 'hero': return t('builder.sections.hero');
+                case 'content': return t('builder.sections.content');
+                case 'content-text': return 'Text Content Section';
+                case 'content-image': return 'Image Content Section';
+                case 'cta': return t('builder.sections.ctaSection');
+                default: return 'Section';
+              }
+            })()}
           </span>
         </div>
       </div>
 
       {selectedSection.type === 'hero' && renderHeroProperties(selectedSection)}
       {selectedSection.type === 'content' && renderContentProperties(selectedSection)}
+      {selectedSection.type === 'content-text' && renderContentTextProperties(selectedSection as any)}
+      {selectedSection.type === 'content-image' && renderContentImageProperties(selectedSection as any)}
       {selectedSection.type === 'cta' && renderCTAProperties(selectedSection)}
       
       {/* Quick Actions */}

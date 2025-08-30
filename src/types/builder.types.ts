@@ -1,5 +1,5 @@
 // Section Types
-export type SectionType = 'hero' | 'content' | 'cta';
+export type SectionType = 'hero' | 'content' | 'content-text' | 'content-image' | 'cta';
 
 export interface BaseSection {
   id: string;
@@ -38,6 +38,35 @@ export interface ContentSection extends BaseSection {
   };
 }
 
+export interface TextContentSection extends BaseSection {
+  type: 'content-text';
+  data: {
+    title: string;
+    content: string;
+    backgroundColor: string;
+    backgroundType: 'color' | 'gradient';
+    backgroundGradient?: string;
+    textColor: string;
+    textAlignment: 'left' | 'center' | 'right';
+    padding: 'small' | 'medium' | 'large';
+  };
+}
+
+export interface ImageContentSection extends BaseSection {
+  type: 'content-image';
+  data: {
+    title: string;
+    content: string;
+    imageUrl: string;
+    imagePublicId?: string;
+    imagePosition: 'left' | 'right' | 'top' | 'bottom';
+    imageSize: 'small' | 'medium' | 'large';
+    backgroundColor: string;
+    textColor: string;
+    padding: 'small' | 'medium' | 'large';
+  };
+}
+
 export interface CTASection extends BaseSection {
   type: 'cta';
   data: {
@@ -67,7 +96,7 @@ export interface CTASection extends BaseSection {
   };
 }
 
-export type Section = HeroSection | ContentSection | CTASection;
+export type Section = HeroSection | ContentSection | TextContentSection | ImageContentSection | CTASection;
 
 // Page State
 export interface PageState {

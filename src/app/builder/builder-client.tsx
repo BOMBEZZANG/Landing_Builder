@@ -8,7 +8,7 @@ import { PublishSettings } from '@/types/builder.types';
 import BuilderLayout from '@/components/builder/BuilderLayout';
 import Toolbar from '@/components/builder/Toolbar';
 import SectionList from '@/components/builder/SectionList';
-import DraggableCanvas from '@/components/builder/DraggableCanvas';
+import Canvas from '@/components/builder/Canvas';
 import PropertyPanel from '@/components/builder/PropertyPanel';
 import TemplateSelector from '@/components/templates/TemplateSelector';
 import SaveTemplateModal from '@/components/templates/SaveTemplateModal';
@@ -202,14 +202,12 @@ export default function BuilderClient() {
   );
 
   const canvas = (
-    <DraggableCanvas
+    <Canvas
       sections={page.sections}
       selectedSectionId={selectedSectionId}
       onSelectSection={handleSelectSection}
       onUpdateSection={handleUpdateSection}
-      onReorderSections={reorderSections}
       isPreviewMode={isPreviewMode}
-      previewDevice={previewDevice}
     />
   );
 
