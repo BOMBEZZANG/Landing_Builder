@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { Section, PageState, BuilderState, DeviceType, TextContentSection, ImageContentSection } from '@/types/builder.types';
+import { TextStyle, ButtonStyle } from '@/types/design.types';
 import { migrateSections, needsMigration } from '@/utils/migration';
+import { needsEnhancedDesignMigration, performEnhancedDesignMigration } from '@/utils/design-migration';
 
 interface HistoryState {
   past: PageState[];
@@ -41,6 +43,14 @@ interface BuilderStore extends BuilderState {
   duplicateSection: (sectionId: string) => void;
   convertSectionType: (sectionId: string, newType: 'content-text' | 'content-image') => void;
   canDeleteSection: (sectionId: string) => boolean;
+  
+  // Enhanced design system actions
+  applyColorPreset: (presetId: string) => void;
+  updateCustomColors: (colors: NonNullable<PageState['globalStyles']['customColors']>) => void;
+  updateFontSettings: (fonts: Partial<NonNullable<PageState['globalStyles']['fontSettings']>>) => void;
+  addRecentEmoji: (emoji: string) => void;
+  updateTextStyle: (sectionId: string, style: Partial<TextStyle>) => void;
+  updateButtonStyle: (sectionId: string, style: Partial<ButtonStyle>) => void;
 }
 
 const defaultSections: Section[] = [
@@ -111,7 +121,15 @@ const createDefaultPage = (): PageState => ({
   globalStyles: {
     primaryColor: '#3b82f6',
     secondaryColor: '#10b981',
-    fontFamily: 'modern'
+    fontFamily: 'modern',
+    // Enhanced design defaults
+    colorPreset: 'ocean',
+    customColors: null,
+    fontSettings: {
+      heading: 'inter',
+      body: 'inter'
+    },
+    recentEmojis: []
   },
   metadata: {
     description: 'A beautiful landing page created with our builder'
@@ -219,16 +237,23 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
         if (saved) {
           let parsed = JSON.parse(saved);
           
-          // Check if migration is needed
+          // Check if sections migration is needed
           if (parsed.sections && needsMigration(parsed.sections)) {
             parsed = {
               ...parsed,
               sections: migrateSections(parsed.sections)
             };
-            // Save migrated version
-            localStorage.setItem('builder-draft', JSON.stringify(parsed));
             console.log('Migrated saved page to new section format');
           }
+          
+          // Check if enhanced design migration is needed
+          if (needsEnhancedDesignMigration(parsed)) {
+            parsed = performEnhancedDesignMigration(parsed);
+            console.log('Migrated saved page to enhanced design system');
+          }
+          
+          // Save migrated version
+          localStorage.setItem('builder-draft', JSON.stringify(parsed));
           
           set((state) => ({
             page: parsed,
@@ -470,16 +495,23 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
         if (saved) {
           let parsed = JSON.parse(saved);
           
-          // Check if migration is needed
+          // Check if sections migration is needed
           if (parsed.sections && needsMigration(parsed.sections)) {
             parsed = {
               ...parsed,
               sections: migrateSections(parsed.sections)
             };
-            // Save migrated version
-            localStorage.setItem('builder-draft', JSON.stringify(parsed));
             console.log('Migrated saved page to new section format');
           }
+          
+          // Check if enhanced design migration is needed
+          if (needsEnhancedDesignMigration(parsed)) {
+            parsed = performEnhancedDesignMigration(parsed);
+            console.log('Migrated saved page to enhanced design system');
+          }
+          
+          // Save migrated version
+          localStorage.setItem('builder-draft', JSON.stringify(parsed));
           
           set((state) => ({
             page: parsed,
@@ -729,6 +761,188 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
       const state = get();
       const section = state.page.sections.find(s => s.id === sectionId);
       return section ? section.type !== 'hero' && section.type !== 'cta' : false;
+    },
+    
+    // Enhanced design system action implementations
+    applyColorPreset: (presetId) => {
+      // Save current state to history before making changes
+      get().saveToHistory();
+      
+      set((state) => {
+        const newGlobalStyles = {
+          ...state.page.globalStyles,
+          colorPreset: presetId,
+          customColors: presetId === 'custom' ? state.page.globalStyles.customColors : null
+        };
+        
+        const newPage = {
+          ...state.page,
+          globalStyles: newGlobalStyles
+        };
+        
+        const newHistory = {
+          ...state.history,
+          present: clonePage(newPage)
+        };
+        
+        return {
+          page: newPage,
+          history: newHistory,
+          hasUnsavedChanges: true
+        };
+      });
+    },
+    
+    updateCustomColors: (colors) => {
+      // Save current state to history before making changes
+      get().saveToHistory();
+      
+      set((state) => {
+        const newGlobalStyles = {
+          ...state.page.globalStyles,
+          colorPreset: 'custom',
+          customColors: colors
+        };
+        
+        const newPage = {
+          ...state.page,
+          globalStyles: newGlobalStyles
+        };
+        
+        const newHistory = {
+          ...state.history,
+          present: clonePage(newPage)
+        };
+        
+        return {
+          page: newPage,
+          history: newHistory,
+          hasUnsavedChanges: true
+        };
+      });
+    },
+    
+    updateFontSettings: (fonts) => {
+      // Save current state to history before making changes
+      get().saveToHistory();
+      
+      set((state) => {
+        const currentFontSettings = state.page.globalStyles.fontSettings || { heading: 'inter', body: 'inter' };
+        const newGlobalStyles = {
+          ...state.page.globalStyles,
+          fontSettings: { ...currentFontSettings, ...fonts }
+        };
+        
+        const newPage = {
+          ...state.page,
+          globalStyles: newGlobalStyles
+        };
+        
+        const newHistory = {
+          ...state.history,
+          present: clonePage(newPage)
+        };
+        
+        return {
+          page: newPage,
+          history: newHistory,
+          hasUnsavedChanges: true
+        };
+      });
+    },
+    
+    addRecentEmoji: (emoji) => {
+      set((state) => {
+        const currentEmojis = state.page.globalStyles.recentEmojis || [];
+        const newEmojis = [emoji, ...currentEmojis.filter(e => e !== emoji)].slice(0, 10); // Keep only 10 recent emojis
+        
+        const newGlobalStyles = {
+          ...state.page.globalStyles,
+          recentEmojis: newEmojis
+        };
+        
+        const newPage = {
+          ...state.page,
+          globalStyles: newGlobalStyles
+        };
+        
+        return {
+          page: newPage,
+          hasUnsavedChanges: true
+        };
+      });
+    },
+    
+    updateTextStyle: (sectionId, style) => {
+      // Save current state to history before making changes
+      get().saveToHistory();
+      
+      set((state) => {
+        const updatedSections = state.page.sections.map((section) => {
+          if (section.id === sectionId) {
+            return {
+              ...section,
+              data: {
+                ...section.data,
+                textStyle: { ...(section.data as any).textStyle, ...style }
+              } as any
+            };
+          }
+          return section;
+        });
+        
+        const newPage = {
+          ...state.page,
+          sections: updatedSections
+        };
+        
+        const newHistory = {
+          ...state.history,
+          present: clonePage(newPage)
+        };
+        
+        return {
+          page: newPage,
+          history: newHistory,
+          hasUnsavedChanges: true
+        };
+      });
+    },
+    
+    updateButtonStyle: (sectionId, style) => {
+      // Save current state to history before making changes
+      get().saveToHistory();
+      
+      set((state) => {
+        const updatedSections = state.page.sections.map((section) => {
+          if (section.id === sectionId) {
+            return {
+              ...section,
+              data: {
+                ...section.data,
+                buttonStyle: { ...(section.data as any).buttonStyle, ...style }
+              } as any
+            };
+          }
+          return section;
+        });
+        
+        const newPage = {
+          ...state.page,
+          sections: updatedSections
+        };
+        
+        const newHistory = {
+          ...state.history,
+          present: clonePage(newPage)
+        };
+        
+        return {
+          page: newPage,
+          history: newHistory,
+          hasUnsavedChanges: true
+        };
+      });
     }
   };
 });

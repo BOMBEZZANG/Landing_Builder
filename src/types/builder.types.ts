@@ -107,6 +107,32 @@ export interface PageState {
     primaryColor: string;
     secondaryColor: string;
     fontFamily: 'modern' | 'classic' | 'playful';
+    // Enhanced design properties
+    colorPreset?: string;
+    customColors?: {
+      primary: string;
+      secondary: string;
+      accent: string;
+      background: {
+        light: string;
+        dark: string;
+      };
+      text: {
+        heading: string;
+        body: string;
+        muted: string;
+      };
+      button: {
+        primary: string;
+        hover: string;
+      };
+    } | null;
+    fontSettings?: {
+      heading: string;
+      body: string;
+      accent?: string;
+    };
+    recentEmojis?: string[];
   };
   metadata: {
     description: string;

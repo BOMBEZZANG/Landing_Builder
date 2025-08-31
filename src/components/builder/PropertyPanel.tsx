@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Section, COLOR_SCHEMES, FONT_OPTIONS, PADDING_OPTIONS } from '@/types/builder.types';
 import { cn } from '@/lib/utils';
 import ColorPicker from '@/components/editor/ColorPicker';
@@ -6,7 +6,9 @@ import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
 import { EmailSettingsSection } from '@/components/builder/PropertyPanels/EmailSettingsSection';
+import EnhancedDesignPanel from '@/components/builder/PropertyPanels/EnhancedDesignPanel';
 import { useTranslation } from '@/components/i18n/I18nProvider';
+import { Settings, Sparkles, Mail } from 'lucide-react';
 
 interface PropertyPanelProps {
   selectedSection: Section | null;
@@ -26,6 +28,7 @@ export default function PropertyPanel({
   onUpdateGlobalStyles
 }: PropertyPanelProps) {
   const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState<'basic' | 'design' | 'email'>('basic');
   const PropertyGroup = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <div className="border-b border-gray-200 pb-4 mb-4 last:border-b-0 last:pb-0 last:mb-0">
       <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
@@ -402,55 +405,98 @@ export default function PropertyPanel({
   );
 
   if (!selectedSection) {
+    const globalTabs = [
+      { id: 'basic', label: 'Basic', icon: Settings },
+      { id: 'design', label: 'Design', icon: Sparkles }
+    ];
+
     return (
-      <div className="text-center py-8">
-        <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-lg flex items-center justify-center">
-          <svg
-            className="w-8 h-8 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"
-            />
-          </svg>
+      <div className="space-y-4">
+        <div className="text-center py-4">
+          <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-lg flex items-center justify-center">
+            <svg
+              className="w-8 h-8 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"
+              />
+            </svg>
+          </div>
+          <p className="text-gray-600 mb-2">{t('builder.properties.noSectionSelected')}</p>
+          <p className="text-sm text-gray-400">{t('builder.properties.clickToEditProperties')}</p>
         </div>
-        <p className="text-gray-600 mb-2">{t('builder.properties.noSectionSelected')}</p>
-        <p className="text-sm text-gray-400">{t('builder.properties.clickToEditProperties')}</p>
-        
-        {/* Global styles section */}
-        <div className="mt-8 text-left">
-          <PropertyGroup title={t('builder.properties.globalStyles')}>
-            <ColorPicker
-              label={t('builder.properties.primaryColor')}
-              color={globalStyles.primaryColor}
-              onChange={(color) => onUpdateGlobalStyles({ primaryColor: color })}
-            />
-            
-            <ColorPicker
-              label={t('builder.properties.secondaryColor')}
-              color={globalStyles.secondaryColor}
-              onChange={(color) => onUpdateGlobalStyles({ secondaryColor: color })}
-            />
-            
-            <Select
-              label={t('builder.properties.fontFamily')}
-              value={globalStyles.fontFamily}
-              onChange={(e) => onUpdateGlobalStyles({ fontFamily: e.target.value as any })}
-              options={FONT_OPTIONS.map(f => ({ value: f.value, label: f.name }))}
-            />
-          </PropertyGroup>
+
+        {/* Global Settings Tab Navigation */}
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex space-x-8">
+            {globalTabs.map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                onClick={() => setActiveTab(id as any)}
+                className={cn(
+                  'flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors',
+                  activeTab === id
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                )}
+              >
+                <Icon className="w-4 h-4" />
+                {label}
+              </button>
+            ))}
+          </nav>
+        </div>
+
+        {/* Global Settings Content */}
+        <div>
+          {activeTab === 'basic' && (
+            <div className="text-left">
+              <PropertyGroup title={t('builder.properties.globalStyles')}>
+                <ColorPicker
+                  label={t('builder.properties.primaryColor')}
+                  color={globalStyles.primaryColor}
+                  onChange={(color) => onUpdateGlobalStyles({ primaryColor: color })}
+                />
+                
+                <ColorPicker
+                  label={t('builder.properties.secondaryColor')}
+                  color={globalStyles.secondaryColor}
+                  onChange={(color) => onUpdateGlobalStyles({ secondaryColor: color })}
+                />
+                
+                <Select
+                  label={t('builder.properties.fontFamily')}
+                  value={globalStyles.fontFamily}
+                  onChange={(e) => onUpdateGlobalStyles({ fontFamily: e.target.value as any })}
+                  options={FONT_OPTIONS.map(f => ({ value: f.value, label: f.name }))}
+                />
+              </PropertyGroup>
+            </div>
+          )}
+
+          {activeTab === 'design' && (
+            <EnhancedDesignPanel selectedSection={null} />
+          )}
         </div>
       </div>
     );
   }
 
+  const tabs = [
+    { id: 'basic', label: 'Basic', icon: Settings },
+    { id: 'design', label: 'Design', icon: Sparkles },
+    ...(selectedSection.type === 'cta' ? [{ id: 'email', label: 'Email', icon: Mail }] : [])
+  ];
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+      {/* Section Header */}
       <div className="bg-gray-50 rounded-lg p-3">
         <div className="flex items-center space-x-2">
           <div className="w-2 h-2 bg-builder-selected rounded-full"></div>
@@ -469,37 +515,76 @@ export default function PropertyPanel({
         </div>
       </div>
 
-      {selectedSection.type === 'hero' && renderHeroProperties(selectedSection)}
-      {selectedSection.type === 'content' && renderContentProperties(selectedSection)}
-      {selectedSection.type === 'content-text' && renderContentTextProperties(selectedSection as any)}
-      {selectedSection.type === 'content-image' && renderContentImageProperties(selectedSection as any)}
-      {selectedSection.type === 'cta' && renderCTAProperties(selectedSection)}
-      
-      {/* Quick Actions */}
-      <PropertyGroup title={t('builder.properties.quickActions')}>
-        <div className="grid grid-cols-2 gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              // Reset section to defaults - implement based on section type
-              console.log('Reset section to defaults');
-            }}
-          >
-            {t('common.reset')}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              // Duplicate section - for future phases
-              console.log('Duplicate section');
-            }}
-          >
-            {t('builder.properties.duplicate')}
-          </Button>
-        </div>
-      </PropertyGroup>
+      {/* Tab Navigation */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
+          {tabs.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => setActiveTab(id as any)}
+              className={cn(
+                'flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors',
+                activeTab === id
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              )}
+            >
+              <Icon className="w-4 h-4" />
+              {label}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* Tab Content */}
+      <div className="min-h-[400px]">
+        {activeTab === 'basic' && (
+          <div className="space-y-6">
+            {selectedSection.type === 'hero' && renderHeroProperties(selectedSection)}
+            {selectedSection.type === 'content' && renderContentProperties(selectedSection)}
+            {selectedSection.type === 'content-text' && renderContentTextProperties(selectedSection as any)}
+            {selectedSection.type === 'content-image' && renderContentImageProperties(selectedSection as any)}
+            {selectedSection.type === 'cta' && renderCTAProperties(selectedSection)}
+            
+            {/* Quick Actions */}
+            <PropertyGroup title={t('builder.properties.quickActions')}>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    console.log('Reset section to defaults');
+                  }}
+                >
+                  {t('common.reset')}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    console.log('Duplicate section');
+                  }}
+                >
+                  {t('builder.properties.duplicate')}
+                </Button>
+              </div>
+            </PropertyGroup>
+          </div>
+        )}
+
+        {activeTab === 'design' && (
+          <EnhancedDesignPanel selectedSection={selectedSection} />
+        )}
+
+        {activeTab === 'email' && selectedSection.type === 'cta' && (
+          <div className="space-y-6">
+            <EmailSettingsSection
+              data={selectedSection.data}
+              onUpdate={onUpdateSection}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
